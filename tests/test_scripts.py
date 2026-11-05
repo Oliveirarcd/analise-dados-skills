@@ -259,3 +259,30 @@ def test_dashboard_rejeita_agregacao_invalida(dados):
     df = io_br.read_table(dados / "lojas.csv")
     with pytest.raises(ValueError):
         dashboard_html.auto_config(df, None, [], ["regiao:soma"])
+
+
+def test_milhar_sem_virgula_depende_do_separador(tmp_path):
+    br = tmp_path / "br.csv"
+    br.write_text("valor;cod\n1.500;0012\n12.000;0013\n", encoding="utf-8")
+    assert io_br.read_table(br)["valor"].tolist() == [1500.0, 12000.0]
+    us = tmp_path / "us.csv"
+    us.write_text("valor,cod\n1.500,0012\n12.000,0013\n", encoding="utf-8")
+    assert io_br.read_table(us)["valor"].tolist() == [1.5, 12.0]
+    dec = tmp_path / "dec.csv"
+    dec.write_text("valor;x\n12.50;a\n3.75;b\n", encoding="utf-8")  # 2 casas: não é milhar
+    assert io_br.read_table(dec)["valor"].tolist() == [12.5, 3.75]
+
+
+def test_baseline_vencedor_nao_conta_como_superado(dados):
+    s, _ = _serie_mensal(dados)
+    res, _ = serie.backtest(s, 6, 12, models=["sazonal_ingenuo"])
+    assert res["melhor"] == "sazonal_ingenuo" and res["melhor_supera_baseline"] is False
+
+
+def test_dashboard_modo_automatico_escolhe_medidas(dados):
+    df = io_br.read_table(dados / "vendas.csv")
+    date, filters, measures = dashboard_html.auto_config(df, None, None, None)
+    cols = {m["col"] for m in measures}
+    assert date == "data"
+    assert {"quantidade", "valor"} <= cols and "id_venda" not in cols
+    assert "canal" in filters

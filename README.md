@@ -86,7 +86,7 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 
 | Parte | Estado |
 |---|---|
-| Scripts Python | testados: 27 testes de comportamento em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
+| Scripts Python | testes de comportamento (pasta `tests/`) rodando em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
 | Dashboard HTML | renderizado no Edge sem interface gráfica; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas |
 | DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
 | MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |

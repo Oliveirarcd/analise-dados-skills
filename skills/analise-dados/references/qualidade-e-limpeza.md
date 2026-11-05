@@ -39,7 +39,7 @@
 ## 4. Padrões brasileiros
 
 - CSV de Excel em português costuma vir com `;` como separador, vírgula decimal, ponto de milhar e codificação cp1252.
-- `1.234` é ambíguo: em dados brasileiros costuma ser mil duzentos e trinta e quatro. `io_br` trata como decimal se toda a coluna tiver o formato `n.nnn` sem vírgula em lugar nenhum; confira o perfil e use `--texto` ou converta à mão quando a coluna for de milhar.
+- `1.234` é ambíguo: em dados brasileiros costuma ser mil duzentos e trinta e quatro. Quando a coluna inteira tem só valores `n.nnn` sem vírgula, `io_br` decide pelo separador do arquivo: CSV com `;` (padrão brasileiro) lê o ponto como milhar; CSV com `,` ou outro separador lê como decimal. Valores como `12.50` (duas casas) são sempre decimais. Confira o perfil (mínimo e máximo) e use `--texto` para tratar à mão quando houver dúvida.
 - CPF/CNPJ: guarde como texto com 11/14 dígitos (`str.zfill`), valide dígito verificador quando a análise depender da identidade. Não exponha CPF em relatórios; use chave substituta.
 - Datas `dd/mm/aaaa` sempre com `dayfirst=True`.
 

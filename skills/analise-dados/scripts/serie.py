@@ -230,7 +230,7 @@ def backtest(s: pd.Series, horizon: int, season: int | None = None, min_train: i
               "criterio": key, "ranking": ranking, "melhor": ranking[0], "metricas": summary,
               "modelos_com_erro": errors}
     if base in summary:
-        result["melhor_supera_baseline"] = summary[ranking[0]][key] < summary[base][key] or ranking[0] == base
+        result["melhor_supera_baseline"] = ranking[0] != base and summary[ranking[0]][key] < summary[base][key]
         result["baseline"] = base
     return result, fc
 

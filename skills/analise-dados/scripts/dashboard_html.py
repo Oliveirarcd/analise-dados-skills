@@ -24,6 +24,7 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -50,8 +51,9 @@ def auto_config(df: pd.DataFrame, date: str | None, filters: list[str] | None, m
                 filters.append(c)
         filters = filters[:6]
     if measures is None:
+        skip = {"id", "cod", "codigo", "cep", "cnpj", "cpf", "ano", "mes", "dia", "num", "nr", "sk", "chave"}
         measures = [f"{c}:soma" for c in df.select_dtypes("number").columns
-                    if not any(t in c.lower() for t in ("id", "cod", "cep", "cnpj", "cpf", "ano", "mes"))][:6]
+                    if not skip & set(re.split(r"[_\W]+", c.lower()))][:6]  # tokens inteiros: "quantidade" não é "id"
     parsed = []
     for m in measures:
         col, _, agg = m.partition(":")

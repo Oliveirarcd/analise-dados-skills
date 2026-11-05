@@ -52,8 +52,12 @@ def _looks_code(s: pd.Series) -> bool:
     return bool(lead_zero or masked)
 
 
-def coerce_numeric(s: pd.Series) -> pd.Series:
-    """Converte texto numérico (BR ou US) em float; devolve a série original se não for numérica."""
+def coerce_numeric(s: pd.Series, sep: str | None = None) -> pd.Series:
+    """Converte texto numérico (BR ou US) em float; devolve a série original se não for numérica.
+
+    Empate sem vírgula ("1.500", "12.000"): CSV com ";" é padrão brasileiro, então o ponto é milhar;
+    com outro separador (ou Excel), o ponto é decimal.
+    """
     if not (s.dtype == object or pd.api.types.is_string_dtype(s)):
         return s
     txt = s.astype("string").str.strip().str.replace(r"^R\$\s*", "", regex=True).str.replace("%", "", regex=False)
@@ -65,9 +69,9 @@ def coerce_numeric(s: pd.Series) -> pd.Series:
     us = non_empty.str.match(_NUM_US).mean()
     if max(br, us) < 0.98:
         return s
-    # Empate (ex.: "12" ou "1.234"): vírgula presente decide BR; sem vírgula e com ponto de milhar ambíguo prefere BR.
     has_comma = non_empty.str.contains(",", regex=False).any()
-    if br >= us and (has_comma or not non_empty.str.match(r"^-?\d+\.\d+$").all()):
+    dot_only = non_empty.str.match(r"^-?\d+\.\d+$").all()  # todo valor no formato n.nnn: ambíguo
+    if br >= us and (has_comma or not dot_only or sep == ";"):
         out = txt.str.replace(".", "", regex=False).str.replace(",", ".", regex=False)
     else:
         out = txt.str.replace(",", "", regex=False)
@@ -89,7 +93,7 @@ def coerce_datetime(s: pd.Series) -> pd.Series:
     return s
 
 
-def infer_types(df: pd.DataFrame, keep_text: list[str] | None = None) -> pd.DataFrame:
+def infer_types(df: pd.DataFrame, keep_text: list[str] | None = None, sep: str | None = None) -> pd.DataFrame:
     keep_text = set(keep_text or [])
     out = df.copy()
     for col in out.columns:
@@ -98,7 +102,7 @@ def infer_types(df: pd.DataFrame, keep_text: list[str] | None = None) -> pd.Data
         original = out[col]  # cada out[col] é um objeto novo no pandas 3: guardar para comparar identidade
         converted = coerce_datetime(original)
         if converted is original:
-            converted = coerce_numeric(original)
+            converted = coerce_numeric(original, sep)
         out[col] = converted
     return out
 
@@ -126,7 +130,7 @@ def read_table(path: str | Path, sep: str | None = None, encoding: str | None = 
         df = pd.read_csv(path, sep=sep, encoding=encoding, dtype=str, keep_default_na=False,
                          na_values=["", "NA", "N/A", "#N/D", "#N/A", "null", "NULL", "-"])
     df.columns = [str(c).strip() for c in df.columns]
-    return infer_types(df, keep_text) if infer else df
+    return infer_types(df, keep_text, sep) if infer else df
 
 
 def to_jsonable(obj):
