@@ -1,0 +1,24 @@
+[project]
+name = "analise-dados-skills"
+version = "1.0.0"
+description = "Skills de análise e ciência de dados em português: perfil, cruzamento auditado, séries temporais, estatística e Power BI via MCP."
+requires-python = ">=3.10"
+dependencies = [
+  "pandas>=2.1",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "statsmodels>=0.14",
+  "openpyxl>=3.1",
+  "plotly>=7.1.0",
+]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["skills/analise-dados/scripts"]
+addopts = "-q"

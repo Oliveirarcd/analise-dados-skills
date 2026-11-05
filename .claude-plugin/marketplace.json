@@ -1,0 +1,14 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "analise-dados-skills",
+  "description": "Skills de análise e ciência de dados em português, com Power BI via MCP.",
+  "owner": { "name": "Oliveirarcd", "url": "https://github.com/Oliveirarcd" },
+  "plugins": [
+    {
+      "name": "analise-dados",
+      "description": "Perfil, cruzamento auditado, estatística, séries temporais, dashboard HTML local e Power BI via MCP.",
+      "source": "./",
+      "category": "data"
+    }
+  ]
+}

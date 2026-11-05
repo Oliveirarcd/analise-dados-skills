@@ -1,0 +1,9 @@
+{
+  "name": "analise-dados",
+  "version": "1.0.0",
+  "description": "Análise e ciência de dados em português: perfil e qualidade, cruzamento auditado, estatística, séries temporais, dashboards HTML interativos locais e Power BI via MCP oficial.",
+  "author": { "name": "Oliveirarcd", "url": "https://github.com/Oliveirarcd" },
+  "repository": "https://github.com/Oliveirarcd/analise-dados-skills",
+  "license": "MIT",
+  "keywords": ["dados", "ciencia-de-dados", "power-bi", "dax", "series-temporais", "dashboard", "pandas", "mcp"]
+}
