@@ -45,7 +45,7 @@ O instalador não sobrescreve skill existente sem `-Sobrescrever` e guarda a ver
 Para o agente abrir o Power BI Desktop, atualizar e conferir os visuais pela tela, há uma configuração do [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) (MIT) só com ferramentas de tela: sem PowerShell, arquivos, registro e processos, e com telemetria desligada. Ele dá ao agente o mouse e o teclado, por isso o plugin **não** o registra sozinho:
 
 ```powershell
-claude mcp add windows --scope user -e ANONYMIZED_TELEMETRY=false -- uvx windows-mcp serve --tools "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"
+claude mcp add windows --scope user -e ANONYMIZED_TELEMETRY=false -- uvx windows-mcp@0.8.8 serve --tools "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"
 ```
 
 Leia antes as regras de uso em [skills/power-bi-mcp/references/operar-windows.md](skills/power-bi-mcp/references/operar-windows.md): tudo o que aparece na tela vai para o provedor do modelo.

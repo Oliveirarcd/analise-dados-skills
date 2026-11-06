@@ -32,12 +32,14 @@ O plugin **não** registra este servidor: ele dá ao agente o mouse e o teclado 
 Claude Code, disponível em todas as pastas (`--scope user`):
 
 ```powershell
-claude mcp add windows --scope user -e ANONYMIZED_TELEMETRY=false -- uvx windows-mcp serve --tools "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"
+claude mcp add windows --scope user -e ANONYMIZED_TELEMETRY=false -- uvx windows-mcp@0.8.8 serve --tools "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"
 ```
 
 Para usar só na pasta atual, troque `--scope user` por `--scope local`. O JSON equivalente para outros clientes está em `mcp/windows.mcp.json`, na raiz do repositório. Se o Claude Code mostrar "Connection closed", troque `uvx` pelo caminho completo que `where.exe uvx` mostra.
 
 O projeto envia telemetria anônima por padrão. `ANONYMIZED_TELEMETRY=false` desliga.
+
+A versão fica fixada em `windows-mcp@0.8.8` (a mais recente no PyPI em 05/11/2026, publicada em 10/10/2026). Assim, uma versão nova de um programa que controla a tela só entra depois de alguém ler as notas dela e trocar o número aqui, no README e em `mcp/windows.mcp.json`.
 
 Para remover: `claude mcp remove windows --scope user`.
 
