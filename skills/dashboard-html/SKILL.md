@@ -1,6 +1,6 @@
 ---
 name: dashboard-html
-description: Gera painéis (dashboards) HTML interativos de arquivo único para abrir localmente no navegador, sem servidor e sem internet — filtros de período e por dimensão com busca, filtro cruzado ao clicar, KPIs com variação contra o período anterior, evolução no tempo com granularidade, rankings, tabela-resumo, tabela de detalhe com busca/ordenação/paginação, exportação CSV, tema claro/escuro e impressão. Use sempre que o usuário pedir um painel, dashboard, visualização interativa, relatório visual em HTML, "algo para abrir no navegador", "para mandar para o gestor filtrar", ou quiser explorar CSV/Excel com filtros sem Power BI.
+description: Gera painéis (dashboards) HTML interativos de arquivo único para abrir localmente no navegador, sem servidor e sem internet — filtros de período e por dimensão com busca, filtro cruzado ao clicar, KPIs animados com variação contra o período anterior, visão 3D interativa, evolução no tempo com granularidade, rankings, tabela-resumo, tabela de detalhe com busca/ordenação/paginação, exportação CSV, tema claro/escuro e impressão. Use sempre que o usuário pedir um painel, dashboard, visualização interativa, relatório visual em HTML, "algo para abrir no navegador", "para mandar para o gestor filtrar", ou quiser explorar CSV/Excel com filtros sem Power BI.
 ---
 
 # Dashboard HTML local
@@ -26,12 +26,18 @@ Agregações: `soma`, `media`, `contagem` (não nulos), `min`, `max`, `distintos
 ## O que o painel entrega
 
 - Faixa de filtros: período (de/até), atalhos (30/90 dias, 12 meses, ano), granularidade (dia, semana ISO, mês, trimestre, ano), seleção múltipla por dimensão com busca, "Limpar filtros" e chips com os filtros ativos.
-- KPIs com variação contra o período imediatamente anterior de mesma duração.
-- Evolução no tempo da medida escolhida.
+- KPIs com variação contra o período imediatamente anterior de mesma duração e minigráfico de tendência.
+- Evolução no tempo da medida escolhida, com área em degradê.
+- Visão 3D: barras por período × item da dimensão escolhida (até 8 itens e 24 períodos), cor pela grandeza em um só tom, giro automático lento, arrastar para girar, roda para aproximar, clique numa barra para filtrar. Ela serve para explorar o padrão; os valores exatos ficam nos rankings, no resumo e no passar do mouse. Sem WebGL (alguns computadores corporativos), o cartão mostra um aviso e o resto do painel segue normal.
 - Ranking por dimensão (top 15). Clicar numa barra filtra o painel todo; clicar de novo desfaz. Cada ranking ignora o próprio filtro para continuar mostrando as alternativas.
 - Resumo por dimensão escolhida, com total e % das linhas, exportável em CSV.
 - Detalhe linha a linha com busca, ordenação por coluna, paginação e exportação CSV do que está filtrado (`;` e vírgula decimal, abre direto no Excel).
-- Tema claro/escuro, impressão, números no padrão brasileiro, paleta acessível.
+- Movimento com função: números contam até o valor novo, barras e linhas fazem transição ao filtrar, cartões entram em sequência e inclinam em 3D sob o mouse. Tudo desliga quando o sistema pede "reduzir movimento".
+- Tema claro/escuro, impressão (a visão 3D não sai no papel), números no padrão brasileiro, paleta acessível.
+
+## Por que 3D só nesse cartão
+
+Barra, pizza ou linha em 3D distorcem a leitura: a perspectiva faz itens iguais parecerem diferentes. Por isso os gráficos de leitura continuam planos, e o 3D fica no cartão em que a terceira dimensão carrega dado de verdade (período × item × valor). Se o usuário pedir 3D num ranking ou numa pizza, explique isso e ofereça a visão 3D.
 
 ## Volume de dados
 

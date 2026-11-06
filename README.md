@@ -10,7 +10,7 @@ Skills de análise e ciência de dados em português para o **Claude Code** (e c
 |---|---|---|
 | `analise-dados` | porta de entrada: contrato da análise, perfil, limpeza, cruzamento, estatística, ML, entrega | `perfil.py`, `cruzar.py`, `estatistica.py` |
 | `series-temporais` | tendência, sazonalidade, anomalias, backtest sem vazamento, previsão com intervalo | `serie.py` |
-| `dashboard-html` | painel de arquivo único, offline, com filtros, filtro cruzado, KPIs, tabelas e exportação CSV | `dashboard_html.py` |
+| `dashboard-html` | painel de arquivo único, offline, com filtros, filtro cruzado, KPIs animados, visão 3D interativa, tabelas e exportação CSV | `dashboard_html.py` |
 | `power-bi-mcp` | modelo estrela, tabela Calendário, DAX, Power Query, PBIP/TMDL/PBIR, validação, uso do MCP | `modelo_estrela.py` + MCP oficial |
 
 Os scripts entendem o padrão brasileiro sem configuração: separador `;`, vírgula decimal, ponto de milhar, datas `dd/mm/aaaa`, arquivos em cp1252 e códigos com zero à esquerda (CNPJ, CEP, código de loja).
@@ -87,7 +87,7 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 | Parte | Estado |
 |---|---|
 | Scripts Python | testes de comportamento (pasta `tests/`) rodando em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
-| Dashboard HTML | renderizado no Edge sem interface gráfica; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas |
+| Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado (inclusive clique na visão 3D), busca e KPIs conferidos contra o pandas; aviso sem WebGL e modo "reduzir movimento" testados |
 | DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
 | MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |
 | Referências | conteúdo de orientação; não executável |

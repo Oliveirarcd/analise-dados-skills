@@ -242,6 +242,16 @@ def test_dashboard_offline(dados, tmp_path):
     assert '<script src="https://cdn.plot.ly' not in h and len(h) > 3_000_000  # Plotly embutido
     data = json.loads(h.split("const D = ", 1)[1].split(";\nconst NF", 1)[0])
     assert data["n"] == 9005 and not data["preagregado"]
+    assert "type:'mesh3d'" in h and "function fail3d" in h  # visão 3D com saída segura sem WebGL
+    assert "prefers-reduced-motion" in h and "RM.matches" in h  # movimento desliga a pedido do sistema
+
+
+def test_dashboard_cdn_usa_mesma_versao_do_plotly_embutido(dados, tmp_path):
+    import plotly.offline
+    out = tmp_path / "c.html"
+    dashboard_html.main([str(dados / "vendas.csv"), "--saida", str(out), "--cdn"])
+    h = out.read_text(encoding="utf-8")
+    assert f"plotly-{plotly.offline.get_plotlyjs_version()}.min.js" in h and len(h) < 3_000_000
 
 
 def test_dashboard_preagregado_preserva_soma(dados, tmp_path):
