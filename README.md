@@ -87,7 +87,7 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 | Parte | Estado |
 |---|---|
 | Scripts Python | testes de comportamento (pasta `tests/`) rodando em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
-| Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado (inclusive clique na visão 3D), busca e KPIs conferidos contra o pandas; aviso sem WebGL e modo "reduzir movimento" testados |
+| Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas; na visão 3D, passar o mouse e clicar numa barra testados com eventos reais de mouse; aviso sem WebGL e modo "reduzir movimento" testados. As transições foram vistas só no estado final |
 | DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
 | MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |
 | Referências | conteúdo de orientação; não executável |

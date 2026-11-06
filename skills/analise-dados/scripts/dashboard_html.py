@@ -407,7 +407,7 @@ function renderDims(){
     const extra=g.length>15?g.slice(15):[];g=g.slice(0,15).reverse();
     const s=state.sel[d];const soft=css('--series-1-soft'),strong=css('--series-1');
     const el=document.getElementById('chDim'+k);
-    Plotly.react(el,[{y:g.map(r=>vals[r[0]]),x:g.map(r=>r[1]),customdata:g.map(r=>r[0]),type:'bar',orientation:'h',
+    Plotly.react(el,[{y:g.map(r=>vals[r[0]]),x:g.map(r=>r[1]),ids:g.map(r=>String(r[0])),customdata:g.map(r=>r[0]),type:'bar',orientation:'h',
       marker:{color:g.map(r=>!s||s.has(r[0])?strong:soft),cornerradius:4,line:{color:css('--surface-1'),width:2}},
       hovertemplate:'%{y}<br><b>%{x:,.2f}</b><extra>'+esc(m.nome)+'</extra>'}],
       layout({margin:{l:130,r:16,t:8,b:36},yaxis:{type:'category',automargin:true,gridcolor:'rgba(0,0,0,0)',linecolor:css('--border')},bargap:.25,
@@ -417,7 +417,7 @@ function renderDims(){
 }
 
 // ------------------------------------------------ visão 3D (barras período × item, WebGL)
-const V3={ok:true,rot:false,vis:true,busy:false,anim:0,last:0,prev:new Map(),cats:[]};
+const V3={ok:true,rot:false,vis:true,busy:false,anim:0,last:0,ck:0,prev:new Map(),cats:[],bars:[]};
 const CAM0={eye:{x:1.38,y:-1.62,z:1.0},center:{x:0,y:0,z:-.2},up:{x:0,y:0,z:1}};  // centro baixo: sobe o gráfico e evita cortar os rótulos da base
 const BOXV=[[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
 const FI=[0,0,4,4,0,0,1,1,2,2,3,3],FJ=[1,2,5,6,1,5,2,6,3,7,0,4],FK=[2,3,6,7,5,4,6,5,7,6,4,7];
@@ -439,7 +439,7 @@ function render3d(){
   const cells=groupBy(idx,i=>{const c=D.dims[d].codigos[i],p=periodKey(D.datas[i],state.gran);return cpos.has(c)&&ppos.has(p)?c+'|'+p:null},m);
   const bars=cells.filter(r=>r[1]!=null&&isFinite(r[1])).map(([k,v])=>{const [c,p]=k.split('|');
     return {k,ci:cpos.get(+c),pj:ppos.get(p),v,txt:`${esc(vals[c])}<br>${p}<br><b>${fmt(v)}</b>`}});
-  V3.cats=cats;
+  V3.cats=cats;V3.bars=bars;
   document.getElementById('t3d').textContent=`Visão 3D — ${m.nome} por ${d} e ${GRAN[state.gran]}`;
   document.getElementById('n3d').textContent=(tot.length>8?`Os 8 maiores de ${tot.length} itens de ${d}. `:'')+(allP.length>24?`Últimos 24 de ${allP.length} períodos. `:'')+
     'Arraste para girar, use a roda do mouse para aproximar e clique numa barra para filtrar. Para ler valores exatos, use os rankings e o resumo.';
@@ -470,7 +470,10 @@ function render3d(){
 }
 function bind3d(el){
   if(el.dataset.bound)return;el.dataset.bound=1;
-  el.on('plotly_click',ev=>{const p=ev.points&&ev.points[0];if(!p)return;const c=V3.cats[Math.round(p.y)];if(c!=null)toggleValue(state.dim3d,c)});
+  // No mesh3d, x/y/z do clique vêm na escala interna da cena; pointNumber é o vértice (8 por barra), o mesmo do rótulo.
+  // O Plotly emite o clique 3D duas vezes: a segunda, logo depois, desfaria o filtro.
+  el.on('plotly_click',ev=>{const p=ev.points&&ev.points[0];if(!p||performance.now()-V3.ck<400)return;V3.ck=performance.now();
+    const b=V3.bars[Math.floor(p.pointNumber/8)];if(b)toggleValue(state.dim3d,V3.cats[b.ci])});
   ['pointerdown','wheel','touchstart'].forEach(t=>el.addEventListener(t,()=>setRot(false),{passive:true}));
   if('IntersectionObserver' in window)new IntersectionObserver(es=>{V3.vis=es[0].isIntersecting}).observe(el);
 }
