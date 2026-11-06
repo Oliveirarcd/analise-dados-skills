@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "windows": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["windows-mcp", "serve", "--tools", "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"],
+      "env": { "ANONYMIZED_TELEMETRY": "false" }
+    }
+  }
+}

@@ -1,6 +1,6 @@
 ---
 name: power-bi-mcp
-description: Construção de dashboards e modelos semânticos no Power BI com apoio do MCP oficial da Microsoft (Power BI Authoring/Modeling MCP) — modelo estrela, relacionamentos, tabela calendário, medidas DAX (inteligência de tempo, variação, acumulado, ranking), Power Query M, RLS, PBIP/TMDL/PBIR, validação de números e boas práticas de layout. Use sempre que o usuário falar em Power BI, PBIX, PBIP, DAX, Power Query, modelo semântico, Fabric, relatório ou painel corporativo no Power BI, ou pedir para transformar planilhas em um dashboard Power BI, mesmo sem citar MCP.
+description: Construção de dashboards e modelos semânticos no Power BI com apoio do MCP oficial da Microsoft (Power BI Authoring/Modeling MCP) — modelo estrela, relacionamentos, tabela calendário, medidas DAX (inteligência de tempo, variação, acumulado, ranking), Power Query M, RLS, PBIP/TMDL/PBIR, validação de números, boas práticas de layout e, com o MCP do Windows, abrir o Power BI Desktop e conferir os visuais pela tela. Use sempre que o usuário falar em Power BI, PBIX, PBIP, DAX, Power Query, modelo semântico, Fabric, relatório ou painel corporativo no Power BI, ou pedir para transformar planilhas em um dashboard Power BI, mesmo sem citar MCP.
 ---
 
 # Power BI com MCP
@@ -25,7 +25,7 @@ O MCP oficial da Microsoft deixa o agente ler e alterar o **modelo semântico** 
 3. **Conecte** pelo MCP (`Connect to '<arquivo>' in Power BI Desktop`, ou modelo no Fabric, ou pasta PBIP) e faça uma leitura sem alterar nada: liste tabelas, colunas e medidas.
 4. **Aplique em lotes pequenos**, com transação quando o servidor local permitir: tabela Calendário marcada como tabela de datas → relacionamentos 1:* com filtro único → tabela `_Medidas` → medidas com formato e pasta → ocultar chaves e colunas técnicas → descrições.
 5. **Valide com DAX** cada medida contra o total conhecido da origem (ver [references/checklist-validacao.md](references/checklist-validacao.md)). Use `EVALUATE SUMMARIZECOLUMNS(...)` e compare com o pandas.
-6. **Monte o relatório**: siga [references/layout-relatorio.md](references/layout-relatorio.md). Com PBIP, as páginas podem ser escritas em PBIR (ver [references/pbip-pbir-tmdl.md](references/pbip-pbir-tmdl.md)); sem PBIP, entregue o roteiro de páginas e visuais para o usuário montar no Desktop.
+6. **Monte o relatório**: siga [references/layout-relatorio.md](references/layout-relatorio.md). Com PBIP, as páginas podem ser escritas em PBIR (ver [references/pbip-pbir-tmdl.md](references/pbip-pbir-tmdl.md)); sem PBIP, entregue o roteiro de páginas e visuais para o usuário montar no Desktop. Se o MCP do Windows estiver ativo na sessão, abra o projeto no Desktop e confira cada página por captura de tela ([references/operar-windows.md](references/operar-windows.md)); sem ele, diga que os visuais não foram vistos renderizados.
 7. **Publique só com autorização** e no workspace que o usuário indicar.
 
 ## 3. Referências
@@ -38,6 +38,7 @@ O MCP oficial da Microsoft deixa o agente ler e alterar o **modelo semântico** 
 | PBIP, TMDL e PBIR: editar o projeto como texto, Git | [pbip-pbir-tmdl.md](references/pbip-pbir-tmdl.md) |
 | Páginas, visuais, cores, acessibilidade, desempenho | [layout-relatorio.md](references/layout-relatorio.md) |
 | Conferir números, desempenho e segurança antes de entregar | [checklist-validacao.md](references/checklist-validacao.md) |
+| Operar o Power BI Desktop pela tela (MCP do Windows, opcional): abrir, atualizar, conferir visuais | [operar-windows.md](references/operar-windows.md) |
 
 ## 4. Regras
 

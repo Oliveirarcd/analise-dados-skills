@@ -40,6 +40,16 @@ cd analise-dados-skills
 
 O instalador não sobrescreve skill existente sem `-Sobrescrever` e guarda a versão anterior com sufixo `.bak-<data>`. Para o MCP do Power BI fora do plugin, veja [skills/power-bi-mcp/references/mcp-configuracao.md](skills/power-bi-mcp/references/mcp-configuracao.md).
 
+### MCP para operar o Windows (opcional)
+
+Para o agente abrir o Power BI Desktop, atualizar e conferir os visuais pela tela, há uma configuração do [Windows-MCP](https://github.com/CursorTouch/Windows-MCP) (MIT) só com ferramentas de tela: sem PowerShell, arquivos, registro e processos, e com telemetria desligada. Ele dá ao agente o mouse e o teclado, por isso o plugin **não** o registra sozinho:
+
+```powershell
+claude mcp add windows --scope user -e ANONYMIZED_TELEMETRY=false -- uvx windows-mcp serve --tools "Screenshot,Snapshot,Click,Type,Scroll,Move,Shortcut,Wait,WaitFor,App,MultiSelect,MultiEdit,Clipboard,DisplayInventory,ControlStatus"
+```
+
+Leia antes as regras de uso em [skills/power-bi-mcp/references/operar-windows.md](skills/power-bi-mcp/references/operar-windows.md): tudo o que aparece na tela vai para o provedor do modelo.
+
 ### Dependências Python
 
 Python 3.10 ou mais novo com `pandas`, `numpy`, `scipy`, `statsmodels`, `openpyxl` e `plotly` (`pip install -r requirements.txt`). Com `uv`: `uv sync`.
@@ -90,6 +100,7 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 | Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas; na visão 3D, passar o mouse e clicar numa barra testados com eventos reais de mouse; aviso sem WebGL e modo "reduzir movimento" testados. As transições foram vistas só no estado final |
 | DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
 | MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |
+| MCP do Windows | configuração opcional conforme o README do projeto em 05/11/2026; **não executado** neste repositório (nem a lista de ferramentas nem a operação da tela) |
 | Referências | conteúdo de orientação; não executável |
 
 ## Estrutura
@@ -102,7 +113,7 @@ skills/
   series-temporais/    SKILL.md, references/
   dashboard-html/      SKILL.md
   power-bi-mcp/        SKILL.md, references/
-mcp/                   exemplos de configuração: Power BI local e hospedado, DuckDB
+mcp/                   exemplos de configuração: Power BI local e hospedado, DuckDB, Windows (opcional)
 docs/ecossistema.md    skills, plugins e MCPs que complementam (com licenças)
 exemplos/              gerador de dados sintéticos e painel de exemplo
 tests/                 testes de comportamento

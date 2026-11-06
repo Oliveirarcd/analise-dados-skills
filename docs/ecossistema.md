@@ -25,6 +25,14 @@ Conferido em 05/11/2026. Os projetos abaixo não são copiados para este reposit
 |---|---|---|
 | [motherduckdb/mcp-server-motherduck](https://github.com/motherduckdb/mcp-server-motherduck) | MCP de DuckDB local (CSV, Parquet, Excel com SQL) e MotherDuck | `mcp/duckdb.mcp.json` ou `claude mcp add --scope user duckdb --transport stdio -- uvx mcp-server-motherduck --db-path :memory: --read-write` |
 
+## Operar o Windows
+
+| Projeto | O que traz | Licença | Configuração |
+|---|---|---|---|
+| [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP) | controle da tela do Windows: capturas, árvore de elementos, clique, digitação, atalhos, janelas. Telemetria anônima ligada por padrão | MIT | `mcp/windows.mcp.json`, só com ferramentas de tela e telemetria desligada. Comando e regras em `skills/power-bi-mcp/references/operar-windows.md`. Não é registrado pelo plugin |
+
+O Windows 11 tem conectores MCP nativos em prévia para participantes do Windows Insider desde dezembro de 2025. Eles só cobrem o Explorador de Arquivos e as Configurações, não programas como o Power BI Desktop.
+
 ## Bibliotecas Python sugeridas por assunto
 
 Instale só quando a análise pedir: `duckdb`, `polars`, `pyarrow` (dados grandes); `rapidfuzz` (casamento aproximado mais rápido, usado automaticamente por `cruzar.py` se presente); `scikit-learn`, `lightgbm`, `shap` (ML); `statsforecast`, `mlforecast`, `prophet`, `sktime`, `ruptures`, `holidays` (séries); `dowhy`, `econml`, `linearmodels` (causalidade e econometria); `matplotlib`, `seaborn`, `kaleido` (gráficos estáticos).
