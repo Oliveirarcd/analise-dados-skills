@@ -12,7 +12,7 @@ O que mudou em cada versão. A política de versões (quando sobe o número maio
 - `docs/manutencao.md`: política de versões, regra "geral na skill, específico no projeto", roteiro para avaliar ferramentas e revisão a cada três meses.
 - `docs/ecossistema.md` virou um quadro de ferramentas, com veredito e data de revisão em cada linha.
 - `CONTRIBUTING.md` e a seção "Como atualizar" no README.
-- Grupo de dependências opcional `visual` (Playwright), também usado no CI.
+- Grupo de dependências opcional `visual` (Playwright, para quem usa `uv`). O Playwright também roda no CI.
 
 ### Mudado
 
@@ -26,6 +26,7 @@ O que mudou em cada versão. A política de versões (quando sobe o número maio
 ### Corrigido
 
 - O painel gerado com `--cdn` volta a mostrar filtros e KPIs quando o Plotly não carrega da internet.
+- `requirements.txt` passa a exigir o Plotly 7.1.0 ou mais novo, a versão testada e a mesma do `pyproject.toml` (antes aceitava 5.20).
 
 ## 1.0.0 — 05/11/2026
 
@@ -34,5 +35,5 @@ Primeira versão. Os acréscimos feitos no mesmo dia entraram sem mudar o númer
 - Skills `analise-dados`, `series-temporais`, `dashboard-html` e `power-bi-mcp`, com scripts testados: perfil, cruzamento auditado, estatística, séries temporais, modelo estrela e painel HTML. Todos leem arquivos no padrão brasileiro.
 - Plugin do Claude Code, que registra o MCP local do Power BI.
 - Painel HTML com visão 3D interativa e movimento; correção do clique na visão 3D e da animação dos rankings.
-- Correções na leitura de números com milhar sem vírgula decimal, na opção de comparação com o modelo de referência e na escolha automática de medidas.
+- Correções na leitura de números com milhar sem vírgula decimal, na escolha automática de medidas do painel e no backtest de séries, que marcava "supera o modelo de referência" mesmo quando o vencedor era o próprio modelo de referência.
 - Configuração opcional do Windows-MCP para operar o Power BI Desktop pela tela, fixada na versão 0.8.8.
