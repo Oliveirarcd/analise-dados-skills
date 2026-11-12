@@ -64,6 +64,6 @@ print(cmp.report())  # linhas que só existem num lado, colunas com diferença e
 ## 7. Carga e agendamento
 
 - Grave a entrega num arquivo temporário e só no fim troque pelo definitivo: se a rotina cair no meio, a entrega de ontem continua inteira.
-- Agende pelo Agendador de Tarefas do Windows (`schtasks`) um script que não pede nada na tela.
+- Agende um script que não pede nada na tela: no Windows, pelo Agendador de Tarefas (`schtasks`); no Linux e no macOS, pelo `cron`.
 - Cada rodada deixa uma linha de registro: início, fim, arquivos lidos, linhas, avisos e resultado.
 - Base que passa de alguns milhões de linhas: DuckDB ou Polars ([dados-grandes-e-sql.md](dados-grandes-e-sql.md)).

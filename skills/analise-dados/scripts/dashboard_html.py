@@ -41,7 +41,7 @@ from io_br import guard_output, read_table
 AGGS = {"soma", "media", "contagem", "min", "max", "distintos"}
 LABEL = {"soma": "Total de", "media": "Média de", "contagem": "Contagem de", "min": "Mínimo de", "max": "Máximo de",
          "distintos": "Distintos de"}
-SIGLAS = {"id", "uf", "cnpj", "cpf", "cep", "sku", "nf", "nfe", "icms", "ipi", "pis", "cofins", "ot", "kpi"}
+SIGLAS = {"id", "uf", "cnpj", "cpf", "cep", "sku", "nf", "nfe", "icms", "ipi", "pis", "cofins", "kpi"}  # só siglas gerais do Brasil
 ABREV = {"cod": "cód.", "codigo": "código", "qtd": "qtd.", "qtde": "qtd.", "vlr": "valor", "vl": "valor",
          "dt": "data", "num": "nº", "nr": "nº", "nro": "nº", "perc": "%", "pct": "%"}
 

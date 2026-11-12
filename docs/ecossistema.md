@@ -1,63 +1,78 @@
-# Ecossistema: skills, plugins e MCPs que complementam
+# Quadro de ferramentas: skills, plugins, MCPs e bibliotecas
 
-Conferido em 05/11/2026; as seções de qualidade visual e de análise e ETL, em 12/11/2026. Os projetos abaixo não são copiados para este repositório: são indicados com link para que cada um seja instalado da fonte, com a licença dele.
+Cada linha tem um veredito e a data em que deve ser revista. Os critérios e o roteiro de avaliação estão em [manutencao.md](manutencao.md). Nada destes projetos é copiado para cá: o que é adotado é reescrito em português ou entra como dependência opcional, com crédito e link; o resto é indicado para instalar da fonte, com a licença dele.
+
+**Vereditos:** **adotar** = faz parte do pacote; **testar** = opcional, falta testar aqui; **observar** = complemento instalado da fonte; **descartar** = não serve aqui.
+
+Última revisão geral: 12/11/2026. Próxima: 12/02/2027.
 
 ## Power BI e Microsoft Fabric
 
-| Projeto | O que traz | Licença | Instalação |
-|---|---|---|---|
-| [microsoft/powerbi-modeling-mcp](https://github.com/microsoft/powerbi-modeling-mcp) | MCP oficial de modelagem (Power BI Authoring MCP, local) | EULA Microsoft | já registrado pelo `.mcp.json` deste plugin; ver `skills/power-bi-mcp/references/mcp-configuracao.md` |
-| [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) | plugin `powerbi-authoring` (skills de modelo semântico e de relatório PBIR, `powerbi-report-cli`) e skills de Fabric | MIT | Claude Code: `/plugin marketplace add microsoft/skills-for-fabric` e depois `/plugin install powerbi-authoring@fabric-collection`. Se instalar, remova o MCP deste plugin para não duplicar |
-| [data-goblin/power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development) | plugins `semantic-models`, `reports`, `pbip`, `pbi-desktop`, `tabular-editor`, `custom-visuals`, `fabric-cli` | GPL-3.0 | `/plugin marketplace add data-goblin/power-bi-agentic-development` |
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [microsoft/powerbi-modeling-mcp](https://github.com/microsoft/powerbi-modeling-mcp) | adotar | MCP oficial de modelagem, registrado pelo `.mcp.json` deste plugin. Conexão real não testada. Configuração em `skills/power-bi-mcp/references/mcp-configuracao.md` | MIT no repositório; o servidor pede aceite do EULA da Microsoft | 12/02/2027 |
+| [microsoft/skills-for-fabric](https://github.com/microsoft/skills-for-fabric) | observar | plugin `powerbi-authoring` (modelo semântico, relatório PBIR, `powerbi-report-cli`) e skills de Fabric: `/plugin marketplace add microsoft/skills-for-fabric` e `/plugin install powerbi-authoring@fabric-collection`. Se instalar, remova o MCP deste plugin para não duplicar | MIT | 12/02/2027 |
+| [data-goblin/power-bi-agentic-development](https://github.com/data-goblin/power-bi-agentic-development) | observar | plugins `semantic-models`, `reports`, `pbip`, `pbi-desktop`, `tabular-editor`, `custom-visuals` e `fabric-cli`: `/plugin marketplace add data-goblin/power-bi-agentic-development`. Só indicação, nada copiado | GPL-3.0 | 12/02/2027 |
 
 ## Análise de dados e ciência
 
-| Projeto | O que traz | Licença |
-|---|---|---|
-| [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) | plugin `data`: SQL, exploração, estatística, visualização, dashboards e conectores (BigQuery, Snowflake, Databricks, Hex, Amplitude) | ver repositório |
-| [anthropics/skills](https://github.com/anthropics/skills) | skills oficiais, incluindo `xlsx`, `pdf`, `docx`, `pptx` | ver repositório |
-| [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | mais de 170 skills científicas (estatística, bioinformática, química, bancos científicos) | MIT |
-| [Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills) | skills de desenvolvimento, incluindo `pandas-pro` | ver repositório |
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [anthropics/knowledge-work-plugins](https://github.com/anthropics/knowledge-work-plugins) | observar | plugin `data`: SQL, exploração, estatística, visualização, dashboards e conectores (BigQuery, Snowflake, Databricks, Hex, Amplitude) | Apache-2.0 | 12/02/2027 |
+| [anthropics/skills](https://github.com/anthropics/skills) | observar | skills oficiais, incluindo `xlsx`, `pdf`, `docx` e `pptx` | licença em cada skill | 12/02/2027 |
+| [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) | observar | mais de 170 skills científicas (estatística, bioinformática, química, bancos científicos) | MIT | 12/02/2027 |
+| [Jeffallan/claude-skills](https://github.com/Jeffallan/claude-skills) | observar | skills de desenvolvimento, incluindo `pandas-pro` | MIT | 12/02/2027 |
+| [krzjoa/awesome-python-data-science](https://github.com/krzjoa/awesome-python-data-science) | observar | índice de bibliotecas por assunto; dele vieram o pandera e o DataComPy. Texto não copiado | CC-BY-4.0 | 12/02/2027 |
+| [microsoft/SandDance](https://github.com/microsoft/SandDance) | observar | explorar dados à mão fora do painel: aplicativo na web, extensão do VS Code e visual do Power BI. Não entra no painel, porque o pacote React/WebGL dele quebraria o arquivo único que abre sem internet. Não testado aqui | MIT | 12/02/2027 |
+| [Avik-Jain/100-Days-Of-ML-Code](https://github.com/Avik-Jain/100-Days-Of-ML-Code) | descartar | roteiro de estudo, parado desde 2023 | MIT | — |
+| [academic/awesome-datascience](https://github.com/academic/awesome-datascience) | descartar | lista de cursos e livros | MIT | — |
+| [donnemartin/data-science-ipython-notebooks](https://github.com/donnemartin/data-science-ipython-notebooks) | descartar | notebooks de estudo antigos, com conteúdo de terceiros | variada, por item | — |
+
+## ETL e rotinas de atualização
+
+O guia está em [etl-e-rotinas.md](../skills/analise-dados/references/etl-e-rotinas.md).
+
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [unionai-oss/pandera](https://github.com/unionai-oss/pandera) | testar | contrato de entrada (colunas, tipos e regras), citado como opcional no guia. O exemplo vem da documentação dele e não foi rodado aqui | MIT | 12/02/2027 |
+| [capitalone/datacompy](https://github.com/capitalone/datacompy) | testar | o que mudou entre duas versões da mesma base, citado como opcional no guia. O exemplo vem da documentação dele e não foi rodado aqui | Apache-2.0 | 12/02/2027 |
 
 ## Bancos e SQL
 
-| Projeto | O que traz | Configuração |
-|---|---|---|
-| [motherduckdb/mcp-server-motherduck](https://github.com/motherduckdb/mcp-server-motherduck) | MCP de DuckDB local (CSV, Parquet, Excel com SQL) e MotherDuck | `mcp/duckdb.mcp.json` ou `claude mcp add --scope user duckdb --transport stdio -- uvx mcp-server-motherduck --db-path :memory: --read-write` |
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [motherduckdb/mcp-server-motherduck](https://github.com/motherduckdb/mcp-server-motherduck) | adotar | MCP de DuckDB local (CSV, Parquet e Excel com SQL), em configuração de exemplo que o plugin não registra: `mcp/duckdb.mcp.json` ou `claude mcp add --scope user duckdb --transport stdio -- uvx mcp-server-motherduck --db-path :memory: --read-write` | MIT | 12/02/2027 |
 
 ## Operar o Windows
 
-| Projeto | O que traz | Licença | Configuração |
-|---|---|---|---|
-| [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP) | controle da tela do Windows: capturas, árvore de elementos, clique, digitação, atalhos, janelas. Telemetria anônima ligada por padrão | MIT | `mcp/windows.mcp.json`, só com ferramentas de tela e telemetria desligada. Comando e regras em `skills/power-bi-mcp/references/operar-windows.md`. Não é registrado pelo plugin |
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [CursorTouch/Windows-MCP](https://github.com/CursorTouch/Windows-MCP) | adotar | controle da tela do Windows (capturas, árvore de elementos, clique, digitação), só com ferramentas de tela e telemetria desligada: `mcp/windows.mcp.json`, versão fixada 0.8.8. Regras em `skills/power-bi-mcp/references/operar-windows.md`. O plugin não registra; não executado aqui | MIT | 12/02/2027 |
+| [vercel-labs/agent-desktop](https://github.com/vercel-labs/agent-desktop) | testar | alternativa para o agente operar programas (Windows, macOS e Linux) pela árvore de acessibilidade, sem depender de imagem da tela. O README dele avisa que leituras de tela e da área de transferência podem conter conteúdo privado. Não testado aqui | Apache-2.0 | 12/02/2027 |
 
 O Windows 11 tem conectores MCP nativos em prévia para participantes do Windows Insider desde dezembro de 2025. Eles só cobrem o Explorador de Arquivos e as Configurações, não programas como o Power BI Desktop.
 
 ## Qualidade visual e conferência de painéis
 
-Só o Playwright é usado pelo código. Os demais entram como referência: as regras foram reescritas em português em [visualizacao-e-entrega.md](../skills/analise-dados/references/visualizacao-e-entrega.md), sem copiar arquivos.
+As regras adotadas estão reescritas em [visualizacao-e-entrega.md](../skills/analise-dados/references/visualizacao-e-entrega.md).
 
-| Projeto | Uso aqui | Licença | Observações |
-|---|---|---|---|
-| [microsoft/playwright](https://github.com/microsoft/playwright) | `conferir_painel.py` e testes: abre o painel sem janela, tira as fotos e mede os defeitos | Apache-2.0 | dependência opcional (`uv sync --group visual` ou `pip install playwright`); usa o Chrome ou o Edge instalados, sem baixar navegador |
-| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | referência: piso de qualidade (contraste, números, estados, foco) e o "modo operar", que é o dos painéis | Apache-2.0 | o detector dele (`npx impeccable detect --json painel.html`, 62 regras, sem IA) **não foi rodado aqui**, porque executa código baixado do npm. Se for usar, fixe a versão e rode com `DO_NOT_TRACK=1`. Não use o instalador, que grava um hook que roda a cada edição, nem o modo `live`, cujo botão Aplicar chama o Codex ou o Claude sem sandbox e sem pedir permissão |
-| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | referência: tabela de 25 tipos de gráfico com quando não usar, limite de volume e alternativa acessível | MIT | o resto da skill é para sites e aplicativos (estilos, fontes, ícones); não vale instalar para painéis de dados |
-| [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) | referência: regras de interface (foco, contraste, formulários, números) | MIT | é a fonte da skill `web-design-guidelines` do [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), repositório que não tem arquivo de licença |
-| [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) | opcional, para depurar com o agente uma página aberta (console, rede, desempenho) | Apache-2.0 | envia estatísticas de uso ao Google por padrão: inicie com `--no-usage-statistics` e `--no-performance-crux`. Para a conferência de rotina, `conferir_painel.py` basta |
+| Projeto | Veredito | Uso aqui | Licença | Revisar em |
+|---|---|---|---|---|
+| [microsoft/playwright](https://github.com/microsoft/playwright) | adotar | `conferir_painel.py` e testes: abre o painel sem janela, tira as fotos e mede os defeitos. Dependência opcional (`uv sync --group visual` ou `pip install playwright`); usa o Chrome ou o Edge instalados | Apache-2.0 | 12/02/2027 |
+| [pbakaus/impeccable](https://github.com/pbakaus/impeccable) | adotar | regras reescritas: piso de qualidade e "modo operar", o dos painéis. O detector dele (`npx impeccable detect --json painel.html`) não foi rodado aqui, porque executa código baixado do npm; se usar, fixe a versão e rode com `DO_NOT_TRACK=1`. Não use o instalador, que grava um hook, nem o modo `live`, cujo botão Aplicar chama o Codex ou o Claude sem sandbox | Apache-2.0 | 12/02/2027 |
+| [nextlevelbuilder/ui-ux-pro-max-skill](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) | adotar | regras reescritas: quando trocar de gráfico, limites de volume e alternativas acessíveis. O resto da skill é para sites e aplicativos | MIT | 12/02/2027 |
+| [vercel-labs/web-interface-guidelines](https://github.com/vercel-labs/web-interface-guidelines) | adotar | regras reescritas de interface (foco, contraste, formulários, números). É a fonte da skill `web-design-guidelines` do [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills), repositório sem arquivo de licença | MIT | 12/02/2027 |
+| [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) | observar | depurar com o agente uma página aberta (console, rede, desempenho). Envia estatísticas de uso ao Google por padrão: inicie com `--no-usage-statistics` e `--no-performance-crux`. Para a conferência de rotina, `conferir_painel.py` basta | Apache-2.0 | 12/02/2027 |
+| [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) | descartar | feita para sites de empresa, com fotos e efeitos, e registra um hook que roda ao fim de cada resposta | MIT | — |
+| [21st-dev/magic-mcp](https://github.com/21st-dev/magic-mcp) | descartar | componentes React; o painel é um HTML único que abre sem internet | ISC | — |
+| [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server) | descartar | componentes React | MIT | — |
 
-Avaliados e não usados: [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT; feita para sites de empresa, com fotos e efeitos, e registra um hook que roda ao fim de cada resposta), [21st-dev/magic-mcp](https://github.com/21st-dev/magic-mcp) e [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server) (componentes React; o painel é um HTML único que abre sem internet) e [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT; SEO).
+## Fora do escopo
 
-## Análise e ETL
-
-Nenhum destes projetos é uma ferramenta de ETL para instalar. Deles saiu a referência [etl-e-rotinas.md](../skills/analise-dados/references/etl-e-rotinas.md), que cita duas bibliotecas opcionais encontradas pela lista do krzjoa e conferidas na fonte: [pandera](https://github.com/unionai-oss/pandera) (MIT; contrato de entrada) e [DataComPy](https://github.com/capitalone/datacompy) (Apache-2.0; o que mudou entre duas versões da mesma base).
-
-| Projeto | Uso aqui | Licença | Observações |
-|---|---|---|---|
-| [krzjoa/awesome-python-data-science](https://github.com/krzjoa/awesome-python-data-science) | índice de bibliotecas por assunto; dele vieram o pandera e o DataComPy | CC-BY-4.0 | lista; usada como índice, texto não copiado |
-| [microsoft/SandDance](https://github.com/microsoft/SandDance) | opcional, para explorar dados à mão fora do painel: aplicativo na web, extensão do VS Code e visual do Power BI | MIT | não entra no painel HTML: o pacote React/WebGL dele quebraria o arquivo único que abre sem internet. Não testado aqui |
-| [vercel-labs/agent-desktop](https://github.com/vercel-labs/agent-desktop) | alternativa ao Windows-MCP para o agente operar programas (Windows, macOS e Linux) pela árvore de acessibilidade, sem depender de imagem da tela | Apache-2.0 | não testado aqui. O próprio README avisa que leituras de tela, área de transferência e registros podem conter conteúdo privado |
-
-Avaliados e não usados: [Avik-Jain/100-Days-Of-ML-Code](https://github.com/Avik-Jain/100-Days-Of-ML-Code) (MIT; roteiro de estudo, parado desde 2023), [academic/awesome-datascience](https://github.com/academic/awesome-datascience) (MIT; lista de cursos e livros), [donnemartin/data-science-ipython-notebooks](https://github.com/donnemartin/data-science-ipython-notebooks) (notebooks de estudo antigos, com conteúdo de terceiros sob licenças variadas) e [nexu-io/open-design](https://github.com/nexu-io/open-design) (Apache-2.0; ambiente de design com IA, não é de dados).
+| Projeto | Veredito | Motivo | Licença | Revisar em |
+|---|---|---|---|---|
+| [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo) | descartar | SEO | MIT | — |
+| [nexu-io/open-design](https://github.com/nexu-io/open-design) | descartar | ambiente de design com IA, não de dados | Apache-2.0 | — |
 
 ## Bibliotecas Python sugeridas por assunto
 

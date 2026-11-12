@@ -56,6 +56,18 @@ Python 3.10 ou mais novo com `pandas`, `numpy`, `scipy`, `statsmodels`, `openpyx
 
 Opcional, para a conferência visual dos painéis: `pip install playwright` (com `uv`: `uv sync --group visual`). Ela usa o Chrome ou o Edge já instalados; sem nenhum dos dois, rode `playwright install chromium`.
 
+### Como atualizar
+
+O que mudou em cada versão está no [CHANGELOG.md](CHANGELOG.md).
+
+- **Plugin do Claude Code:** rode os dois comandos abaixo e reinicie o Claude Code.
+  ```
+  claude plugin marketplace update analise-dados-skills
+  claude plugin update analise-dados@analise-dados-skills
+  ```
+- **Skills pessoais (Claude Code ou Codex):** na pasta do repositório, rode `git pull` e o instalador de novo com `-Sobrescrever` (Windows) ou `--sobrescrever` (Linux/macOS), mais `-Codex` ou `--codex` se você instalou para o Codex. A versão anterior fica guardada com o sufixo `.bak-<data>`.
+- **Dependências Python:** depois de atualizar, rode `pip install -r requirements.txt` ou `uv sync`.
+
 ## Exemplos rápidos
 
 Gere os dados sintéticos e experimente (tudo fictício, nada de dado real):
@@ -96,6 +108,10 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 - "Monta um painel em HTML com filtro de período, região e canal para eu mandar para o gestor."
 - "Transforma essas três planilhas em um modelo no Power BI, com medidas de ano anterior e acumulado." (com o Power BI Desktop aberto e o MCP ativo, o agente aplica e valida no modelo)
 
+## Usar em qualquer projeto
+
+A skill traz só o que vale para qualquer base. O que é de um projeto (nomes de colunas, de-para, pesos, metas, siglas internas) fica na pasta do próprio projeto: preencha o contrato da análise ([modelo](skills/analise-dados/assets/contrato-analise.md)), salve-o na pasta do projeto e cite-o no `AGENTS.md` ou no `CLAUDE.md` dele. Assim, a mesma skill atende projetos diferentes e pode ser atualizada sem apagar as regras de ninguém. Detalhes em [docs/manutencao.md](docs/manutencao.md).
+
 ## Estado de cada parte
 
 | Parte | Estado |
@@ -118,7 +134,10 @@ skills/
   dashboard-html/      SKILL.md
   power-bi-mcp/        SKILL.md, references/
 mcp/                   exemplos de configuração: Power BI local e hospedado, DuckDB, Windows (opcional)
-docs/ecossistema.md    skills, plugins e MCPs que complementam (com licenças)
+docs/ecossistema.md    quadro de ferramentas: veredito, licença e data de revisão
+docs/manutencao.md     versões, geral × específico, avaliação de ferramentas, revisão trimestral
+CHANGELOG.md           o que mudou em cada versão
+CONTRIBUTING.md        como propor melhorias
 exemplos/              gerador de dados sintéticos e painel de exemplo
 tests/                 testes de comportamento
 ferramentas/           validador do repositório
@@ -132,7 +151,7 @@ uv run pytest                 # testes
 uv run python ferramentas/validar_skills.py   # frontmatter, links, JSON, --help dos scripts
 ```
 
-Regras para quem contribui estão em [AGENTS.md](AGENTS.md).
+Como contribuir: [CONTRIBUTING.md](CONTRIBUTING.md). Regras completas para quem mantém, inclusive agentes: [AGENTS.md](AGENTS.md). Versões, avaliação de ferramentas e revisão trimestral: [docs/manutencao.md](docs/manutencao.md).
 
 ## Segurança e privacidade
 
@@ -142,4 +161,4 @@ Regras para quem contribui estão em [AGENTS.md](AGENTS.md).
 
 ## Licença
 
-MIT. Os projetos citados em `docs/ecossistema.md` têm licenças próprias e não estão incluídos aqui.
+MIT. Os projetos citados em `docs/ecossistema.md` têm licenças próprias e não estão incluídos aqui; o que foi adotado deles está reescrito em português, com crédito e link.
