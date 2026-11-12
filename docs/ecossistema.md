@@ -1,6 +1,6 @@
 # Ecossistema: skills, plugins e MCPs que complementam
 
-Conferido em 05/11/2026; a seção de qualidade visual, em 12/11/2026. Os projetos abaixo não são copiados para este repositório: são indicados com link para que cada um seja instalado da fonte, com a licença dele.
+Conferido em 05/11/2026; as seções de qualidade visual e de análise e ETL, em 12/11/2026. Os projetos abaixo não são copiados para este repositório: são indicados com link para que cada um seja instalado da fonte, com a licença dele.
 
 ## Power BI e Microsoft Fabric
 
@@ -47,9 +47,21 @@ Só o Playwright é usado pelo código. Os demais entram como referência: as re
 
 Avaliados e não usados: [Leonxlnx/taste-skill](https://github.com/Leonxlnx/taste-skill) (MIT; feita para sites de empresa, com fotos e efeitos, e registra um hook que roda ao fim de cada resposta), [21st-dev/magic-mcp](https://github.com/21st-dev/magic-mcp) e [Jpisnice/shadcn-ui-mcp-server](https://github.com/Jpisnice/shadcn-ui-mcp-server) (componentes React; o painel é um HTML único que abre sem internet) e [AgriciDaniel/claude-seo](https://github.com/AgriciDaniel/claude-seo) (MIT; SEO).
 
+## Análise e ETL
+
+Nenhum destes projetos é uma ferramenta de ETL para instalar. Deles saiu a referência [etl-e-rotinas.md](../skills/analise-dados/references/etl-e-rotinas.md), que cita duas bibliotecas opcionais encontradas pela lista do krzjoa e conferidas na fonte: [pandera](https://github.com/unionai-oss/pandera) (MIT; contrato de entrada) e [DataComPy](https://github.com/capitalone/datacompy) (Apache-2.0; o que mudou entre duas versões da mesma base).
+
+| Projeto | Uso aqui | Licença | Observações |
+|---|---|---|---|
+| [krzjoa/awesome-python-data-science](https://github.com/krzjoa/awesome-python-data-science) | índice de bibliotecas por assunto; dele vieram o pandera e o DataComPy | CC-BY-4.0 | lista; usada como índice, texto não copiado |
+| [microsoft/SandDance](https://github.com/microsoft/SandDance) | opcional, para explorar dados à mão fora do painel: aplicativo na web, extensão do VS Code e visual do Power BI | MIT | não entra no painel HTML: o pacote React/WebGL dele quebraria o arquivo único que abre sem internet. Não testado aqui |
+| [vercel-labs/agent-desktop](https://github.com/vercel-labs/agent-desktop) | alternativa ao Windows-MCP para o agente operar programas (Windows, macOS e Linux) pela árvore de acessibilidade, sem depender de imagem da tela | Apache-2.0 | não testado aqui. O próprio README avisa que leituras de tela, área de transferência e registros podem conter conteúdo privado |
+
+Avaliados e não usados: [Avik-Jain/100-Days-Of-ML-Code](https://github.com/Avik-Jain/100-Days-Of-ML-Code) (MIT; roteiro de estudo, parado desde 2023), [academic/awesome-datascience](https://github.com/academic/awesome-datascience) (MIT; lista de cursos e livros), [donnemartin/data-science-ipython-notebooks](https://github.com/donnemartin/data-science-ipython-notebooks) (notebooks de estudo antigos, com conteúdo de terceiros sob licenças variadas) e [nexu-io/open-design](https://github.com/nexu-io/open-design) (Apache-2.0; ambiente de design com IA, não é de dados).
+
 ## Bibliotecas Python sugeridas por assunto
 
-Instale só quando a análise pedir: `duckdb`, `polars`, `pyarrow` (dados grandes); `rapidfuzz` (casamento aproximado mais rápido, usado automaticamente por `cruzar.py` se presente); `scikit-learn`, `lightgbm`, `shap` (ML); `statsforecast`, `mlforecast`, `prophet`, `sktime`, `ruptures`, `holidays` (séries); `dowhy`, `econml`, `linearmodels` (causalidade e econometria); `matplotlib`, `seaborn`, `kaleido` (gráficos estáticos).
+Instale só quando a análise pedir: `pandera` (contrato de entrada) e `datacompy` (comparação entre cargas) em rotinas de ETL; `duckdb`, `polars`, `pyarrow` (dados grandes); `rapidfuzz` (casamento aproximado mais rápido, usado automaticamente por `cruzar.py` se presente); `scikit-learn`, `lightgbm`, `shap` (ML); `statsforecast`, `mlforecast`, `prophet`, `sktime`, `ruptures`, `holidays` (séries); `dowhy`, `econml`, `linearmodels` (causalidade e econometria); `matplotlib`, `seaborn`, `kaleido` (gráficos estáticos).
 
 ## Como as skills deste repositório convivem com as outras
 

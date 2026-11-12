@@ -1,6 +1,6 @@
 ---
 name: analise-dados
-description: Análise e ciência de dados ponta a ponta em português — perfil e qualidade de bases, limpeza, cruzamento/conciliação auditada entre planilhas e sistemas, estatística (testes, A/B, correlação), modelagem preditiva, séries temporais e entrega em dashboard HTML ou Power BI. Use sempre que o usuário mandar CSV/Excel/Parquet e pedir para analisar, investigar, cruzar, conciliar, comparar bases, achar divergências, explicar variações, testar hipóteses, prever, montar indicadores ou relatório analítico, inclusive arquivos no padrão brasileiro (separador ;, vírgula decimal, datas dd/mm/aaaa, CNPJ/CPF, cp1252) e mesmo que ele não diga "ciência de dados".
+description: Análise e ciência de dados ponta a ponta em português — perfil e qualidade de bases, limpeza, cruzamento/conciliação auditada entre planilhas e sistemas, estatística (testes, A/B, correlação), modelagem preditiva, séries temporais, rotinas de ETL (exportação periódica de sistema, histórico, comparação entre cargas) e entrega em dashboard HTML ou Power BI. Use sempre que o usuário mandar CSV/Excel/Parquet e pedir para analisar, investigar, cruzar, conciliar, comparar bases ou duas versões da mesma base, achar divergências, explicar variações, testar hipóteses, prever, montar indicadores, relatório analítico ou uma rotina que atualize a base sozinha, inclusive arquivos no padrão brasileiro (separador ;, vírgula decimal, datas dd/mm/aaaa, CNPJ/CPF, cp1252) e mesmo que ele não diga "ciência de dados" nem "ETL".
 ---
 
 # Análise de dados (orquestradora)
@@ -18,6 +18,7 @@ O objetivo é responder a uma pergunta de negócio com números que se sustentam
 | Aprendizado de máquina | [references/machine-learning.md](references/machine-learning.md) |
 | Gráficos, narrativa e entrega | [references/visualizacao-e-entrega.md](references/visualizacao-e-entrega.md) |
 | Dados grandes, SQL e DuckDB | [references/dados-grandes-e-sql.md](references/dados-grandes-e-sql.md) |
+| ETL e rotinas de atualização (exportação periódica, histórico, comparação entre cargas) | [references/etl-e-rotinas.md](references/etl-e-rotinas.md) |
 
 Leia só a referência do trabalho em curso. Uma pergunta simples ("quanto vendeu por região?") não precisa percorrer o fluxo inteiro.
 
