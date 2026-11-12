@@ -2,7 +2,7 @@
 
 O que mudou em cada versão. A política de versões (quando sobe o número maior, o menor ou a correção) está em [docs/manutencao.md](docs/manutencao.md). Para atualizar a sua instalação, veja "Como atualizar" no [README](README.md).
 
-## 1.1.0 — não publicada
+## 1.1.0 — 12/11/2026
 
 ### Acrescentado
 
