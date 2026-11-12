@@ -33,7 +33,7 @@ Leia só a referência do trabalho em curso. Uma pergunta simples ("quanto vende
 
 ## Scripts
 
-Ficam em `scripts/` desta skill. Requerem Python 3.10+ com pandas, numpy, scipy, statsmodels, openpyxl e plotly (`pip install -r requirements.txt` na raiz do repositório). Todos leem CSV, Excel, Parquet e JSON; detectam separador, codificação, vírgula decimal e datas brasileiras; mantêm códigos com zero à esquerda como texto; e recusam sobrescrever saídas (use `--sobrescrever`). `--help` mostra todas as opções.
+Ficam em `scripts/` desta skill. Requerem Python 3.10+ com pandas, numpy, scipy, statsmodels, openpyxl e plotly (`pip install -r requirements.txt` na raiz do repositório). Todos leem CSV, Excel, Parquet e JSON; detectam separador, codificação, vírgula decimal e datas brasileiras; mantêm códigos com zero à esquerda como texto; e recusam sobrescrever saídas (use `--sobrescrever`). A exceção é `conferir_painel.py`, que lê HTML e reescreve a pasta de conferência a cada rodada. `--help` mostra todas as opções.
 
 ```bash
 S=<pasta desta skill>/scripts

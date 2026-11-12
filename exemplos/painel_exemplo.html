@@ -223,7 +223,8 @@ function spark(k,ys){
 
 // ------------------------------------------------ visuais
 // Textos dos botões do Plotly em português; o Plotly embutido só traz o inglês.
-Plotly.register({moduleType:'locale',name:'pt-BR',dictionary:{'Autoscale':'Escala automática','Box Select':'Seleção retangular',
+// Sem o Plotly (--cdn sem internet), segue sem registrar: filtros, KPIs e tabelas ainda aparecem.
+if(window.Plotly)Plotly.register({moduleType:'locale',name:'pt-BR',dictionary:{'Autoscale':'Escala automática','Box Select':'Seleção retangular',
   'Compare data on hover':'Comparar dados ao passar o mouse','Double-click to zoom back out':'Clique duas vezes para voltar ao zoom inicial',
   'Download plot':'Baixar gráfico','Download plot as a PNG':'Baixar gráfico como PNG','Lasso Select':'Seleção livre','Orbital rotation':'Rotação orbital',
   'Pan':'Mover','Reset axes':'Restaurar eixos','Reset camera to default':'Restaurar vista inicial','Reset camera to last save':'Restaurar última vista',

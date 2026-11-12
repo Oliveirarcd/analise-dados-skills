@@ -380,3 +380,22 @@ def test_painel_gerado_passa_na_conferencia_e_bate_com_pandas(dados, tmp_path):
     assert kpi["Registros"] == f"{len(df):,}".replace(",", ".")
     assert kpi["Total de quantidade"] == f"{int(df['quantidade'].sum()):,}".replace(",", ".")
     assert float(kpi["Total de valor"].removesuffix(" mi").replace(",", ".")) == pytest.approx(df["valor"].sum() / 1e6, abs=0.005)
+
+
+def test_painel_cdn_sem_internet_ainda_mostra_kpis(dados, tmp_path):
+    pw = pytest.importorskip("playwright.sync_api")
+    painel = tmp_path / "cdn.html"
+    dashboard_html.main([str(dados / "vendas.csv"), "--saida", str(painel), "--cdn"])
+    with pw.sync_playwright() as p:
+        try:
+            browser, _ = conferir_painel._abrir(p, None)
+        except conferir_painel.NavegadorAusente as e:
+            pytest.skip(str(e))
+        ctx = browser.new_context(reduced_motion="reduce")  # sem animação: o KPI já mostra o valor final
+        ctx.route("**/cdn.plot.ly/**", lambda r: r.abort())  # Plotly não carrega: gráficos somem, o resto fica
+        pg = ctx.new_page()
+        pg.goto(painel.resolve().as_uri())
+        pg.wait_for_timeout(500)
+        kpis = pg.eval_on_selector_all(".kpi .val", "els => els.map(e => e.textContent)")
+        browser.close()
+    assert kpis and kpis[0] == "9.005"
