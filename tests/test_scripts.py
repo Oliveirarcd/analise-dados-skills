@@ -12,6 +12,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "exemplos"))
 
+import conferir_painel  # noqa: E402
 import cruzar  # noqa: E402
 import dashboard_html  # noqa: E402
 import estatistica  # noqa: E402
@@ -240,10 +241,12 @@ def test_dashboard_offline(dados, tmp_path):
     h = out.read_text(encoding="utf-8")
     assert "Teste &lt;b&gt;" in h  # título escapado
     assert '<script src="https://cdn.plot.ly' not in h and len(h) > 3_000_000  # Plotly embutido
-    data = json.loads(h.split("const D = ", 1)[1].split(";\nconst NF", 1)[0])
+    data = json.loads(h.split("const D = ", 1)[1].split(";\n", 1)[0])  # JSON compacto: não tem quebra de linha
     assert data["n"] == 9005 and not data["preagregado"]
     assert "type:'mesh3d'" in h and "function fail3d" in h  # visão 3D com saída segura sem WebGL
     assert "prefers-reduced-motion" in h and "RM.matches" in h  # movimento desliga a pedido do sistema
+    assert "moduleType:'locale',name:'pt-BR'" in h and "separatethousands:true" in h  # Plotly em português, 1.400 nos eixos
+    assert data["rotulos"]["cod_loja"] == "Cód. loja" and data["medidas"][0]["nome"] == "Total de valor"
 
 
 def test_dashboard_cdn_usa_mesma_versao_do_plotly_embutido(dados, tmp_path):
@@ -296,3 +299,84 @@ def test_dashboard_modo_automatico_escolhe_medidas(dados):
     assert date == "data"
     assert {"quantidade", "valor"} <= cols and "id_venda" not in cols
     assert "canal" in filters
+
+
+def test_rotulos_legiveis():
+    r = dashboard_html.rotulo
+    assert r("cod_loja") == "Cód. loja" and r("id_venda") == "ID venda" and r("valor_total") == "Valor total"
+    assert r("qtd") == "Qtd." and r("Agência") == "Agência" and r("Valor Total") == "Valor Total"  # já legíveis
+    df = pd.DataFrame({"data": pd.to_datetime(["2025-01-01", "2025-02-01"]), "cod_loja": ["1", "2"], "vlr_venda": [1.0, 2.0]})
+    date, f, m = dashboard_html.auto_config(df, None, ["cod_loja"], ["vlr_venda:soma", "cod_loja:distintos"])
+    assert [x["nome"] for x in m] == ["Total de valor venda", "Distintos de cód. loja"]
+    p = dashboard_html.build_payload(df, date, f, m, 1000)
+    assert p["rotulos"] == {"data": "Data", "cod_loja": "Cód. loja", "vlr_venda": "Valor venda"}
+
+# ------------------------------------------------------------ conferência visual do painel
+
+
+def _conferir(arquivo, saida, **kw):
+    pytest.importorskip("playwright.sync_api")
+    try:
+        return conferir_painel.conferir(arquivo, saida, **kw)
+    except conferir_painel.NavegadorAusente as e:
+        pytest.skip(str(e))
+
+
+def test_conferencia_avalia_limites_de_contraste_e_rolagem():
+    texto = {"elemento": "p", "cor": "#bbbbbb", "fundo": "#ffffff", "px": 14, "grande": False}
+    medida = {"largura_pagina": 900, "largura_tela": 390, "culpados": ["div (900 px)"], "graficos": 1,
+              "sem_desenho": [], "nao_medidos": 0, "indicadores": [],
+              "textos": [{**texto, "texto": "apagado", "razao": 1.92},
+                         {**texto, "texto": "título", "razao": 3.2, "px": 26, "grande": True},  # grande: mínimo 3:1
+                         {**texto, "texto": "nota", "razao": 7.0, "px": 9}]}
+    t = conferir_painel.avaliar(medida)
+    assert t["rolagem_horizontal"] and t["culpados"] == ["div (900 px)"]
+    assert [f["exemplo"] for f in t["contraste_falhas"]] == ["apagado"] and t["defeitos"] == 2
+    assert [f["exemplo"] for f in t["texto_pequeno"]] == ["nota"] and t["avisos"] == 1
+
+
+def test_conferencia_sem_arquivo_playwright_ou_navegador(tmp_path, monkeypatch, capsys):
+    assert conferir_painel.main([str(tmp_path / "nao_existe.html"), "--saida", str(tmp_path / "c")]) == 2
+    assert "não encontrado" in capsys.readouterr().err
+    pagina = tmp_path / "p.html"
+    pagina.write_text("<p>oi</p>", encoding="utf-8")
+
+    def sem_playwright(*a, **k):
+        raise ImportError("playwright")
+    monkeypatch.setattr(conferir_painel, "conferir", sem_playwright)
+    assert conferir_painel.main([str(pagina), "--saida", str(tmp_path / "c")]) == 2
+    assert "pip install playwright" in capsys.readouterr().err
+
+    def sem_navegador(*a, **k):
+        raise conferir_painel.NavegadorAusente("Nenhum navegador encontrado")
+    monkeypatch.setattr(conferir_painel, "conferir", sem_navegador)
+    assert conferir_painel.main([str(pagina), "--saida", str(tmp_path / "c")]) == 2
+    assert "Nenhum navegador" in capsys.readouterr().err
+
+
+def test_conferencia_aponta_defeitos_no_navegador(tmp_path):
+    ruim = tmp_path / "ruim.html"
+    ruim.write_text('<!DOCTYPE html><html lang="pt-BR"><body style="margin:0;background:#fff">'
+                    '<p style="color:#bbb">texto apagado</p><div style="width:900px;height:20px"></div>'
+                    '<script>throw new Error("falha proposital")</script></body></html>', encoding="utf-8")
+    rel = _conferir(ruim, tmp_path / "c", larguras=[390], temas=["claro"])
+    tela = rel["telas"][0]
+    assert tela["rolagem_horizontal"] and tela["culpados"] == ["html > body > div (900 px)"]
+    assert any("falha proposital" in e for e in tela["erros"])
+    assert [f["exemplo"] for f in tela["contraste_falhas"]] == ["texto apagado"]
+    assert rel["defeitos"] == 3 and Path(tela["foto"]).stat().st_size > 0
+    assert json.loads((tmp_path / "c" / "relatorio.json").read_text(encoding="utf-8"))["defeitos"] == 3
+
+
+def test_painel_gerado_passa_na_conferencia_e_bate_com_pandas(dados, tmp_path):
+    painel = tmp_path / "painel.html"
+    dashboard_html.main([str(dados / "vendas.csv"), "--saida", str(painel), "--filtros", "canal", "cod_loja",
+                         "--medidas", "valor:soma", "quantidade:soma"])
+    rel = _conferir(painel, tmp_path / "c")  # computador e celular, temas claro e escuro
+    assert rel["defeitos"] == 0, conferir_painel.resumo(rel)
+    assert {t["largura"] for t in rel["telas"]} == {1440, 390} and all(t["graficos"] >= 3 for t in rel["telas"])
+    df = io_br.read_table(dados / "vendas.csv")
+    kpi = {k["rotulo"]: k["valor"] for k in rel["indicadores"]}
+    assert kpi["Registros"] == f"{len(df):,}".replace(",", ".")
+    assert kpi["Total de quantidade"] == f"{int(df['quantidade'].sum()):,}".replace(",", ".")
+    assert float(kpi["Total de valor"].removesuffix(" mi").replace(",", ".")) == pytest.approx(df["valor"].sum() / 1e6, abs=0.005)

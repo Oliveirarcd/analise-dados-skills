@@ -48,6 +48,7 @@ python $S/estatistica.py amostra --taxa-base 0.10 --efeito-minimo 0.02 --saida a
 python $S/serie.py backtest serie.csv --data data --valor valor --freq MS --sazonal 12 --horizonte 6 --saida bt.json
 python $S/modelo_estrela.py vendas.csv lojas.csv produtos.csv --saida modelo_pbi
 python $S/dashboard_html.py base.csv --titulo "Painel" --saida painel.html
+python $S/conferir_painel.py painel.html --saida conferencia/   # requer: pip install playwright
 ```
 
 O que cada um garante:
@@ -55,6 +56,7 @@ O que cada um garante:
 - `perfil.py`: só agregados; com `--sem-exemplos` não exporta nenhum valor de célula (use em dados pessoais).
 - `cruzar.py`: falha se a cardinalidade esperada for violada em vez de duplicar linhas em silêncio; mostra quantas chaves só casam normalizando (espaço, caixa, acento, pontuação, zeros à esquerda); reconcilia a soma das colunas indicadas; sugestões aproximadas são para revisão humana e nunca são aplicadas sozinhas.
 - `estatistica.py`: escolhe paramétrico ou não paramétrico pela normalidade e pelo tamanho da amostra, informa tamanho de efeito e corrige comparações múltiplas (Holm).
+- `conferir_painel.py`: abre qualquer HTML (painel, relatório, gráfico Plotly) num navegador sem janela, em tamanho de computador e de celular e nos temas claro e escuro, tira as fotos e aponta erro de script, gráfico sem desenho, rolagem horizontal e contraste abaixo de 4,5:1. Precisa do Playwright e do Chrome ou do Edge; as fotos precisam ser olhadas, a medição não vê corte nem sobreposição.
 - `serie.py`, `modelo_estrela.py` e `dashboard_html.py`: detalhados nas skills `series-temporais`, `power-bi-mcp` e `dashboard-html`.
 
 Para algo que os scripts não cobrem, escreva código pandas/DuckDB no mesmo espírito: travas de cardinalidade (`merge(validate=..., indicator=True)`), contagem antes/depois e totais reconciliados.

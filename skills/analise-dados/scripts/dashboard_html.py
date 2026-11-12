@@ -19,7 +19,8 @@ Uso:
          [--max-linhas 200000] [--cdn]
 
 Agregações: soma, media, contagem (não nulos), min, max, distintos (só com dados linha a linha).
-A medida "Linhas" (contagem de registros) é sempre incluída.
+A medida "Registros" (contagem de linhas) é sempre incluída. Nomes de coluna viram rótulos
+legíveis (cod_loja -> "Cód. loja"); colunas com maiúscula ou espaço no nome ficam como estão.
 Acima de --max-linhas, os dados são pré-agregados por dia + filtros (soma, contagem, mín e máx
 preservam o resultado exato; distintos deixa de estar disponível).
 """
@@ -38,7 +39,30 @@ import pandas as pd
 from io_br import guard_output, read_table
 
 AGGS = {"soma", "media", "contagem", "min", "max", "distintos"}
-LABEL = {"soma": "Total", "media": "Média", "contagem": "Qtd", "min": "Mín", "max": "Máx", "distintos": "Distintos"}
+LABEL = {"soma": "Total de", "media": "Média de", "contagem": "Contagem de", "min": "Mínimo de", "max": "Máximo de",
+         "distintos": "Distintos de"}
+SIGLAS = {"id", "uf", "cnpj", "cpf", "cep", "sku", "nf", "nfe", "icms", "ipi", "pis", "cofins", "ot", "kpi"}
+ABREV = {"cod": "cód.", "codigo": "código", "qtd": "qtd.", "qtde": "qtd.", "vlr": "valor", "vl": "valor",
+         "dt": "data", "num": "nº", "nr": "nº", "nro": "nº", "perc": "%", "pct": "%"}
+
+
+def rotulo(col: str) -> str:
+    """Nome de coluna para leitura: 'cod_loja' -> 'Cód. loja', 'id_venda' -> 'ID venda'.
+
+    Nome com maiúscula ou espaço já foi escrito para gente ler e fica como está.
+    """
+    if col != col.lower() or " " in col.strip():
+        return col
+    partes = [p for p in re.split(r"[_\-.]+", col) if p]
+    if not partes:
+        return col
+    txt = " ".join(p.upper() if p in SIGLAS else ABREV.get(p, p) for p in partes)
+    return txt[0].upper() + txt[1:]
+
+
+def _no_meio(r: str) -> str:
+    """Rótulo no meio da frase ('Total de valor'): minúscula inicial, menos em sigla."""
+    return r if r.split()[0].isupper() else r[0].lower() + r[1:]
 
 
 def auto_config(df: pd.DataFrame, date: str | None, filters: list[str] | None, measures: list[str] | None):
@@ -68,7 +92,7 @@ def auto_config(df: pd.DataFrame, date: str | None, filters: list[str] | None, m
             raise ValueError(f"Agregação inválida em '{m}'. Use: {', '.join(sorted(AGGS))}")
         if agg != "distintos" and agg != "contagem" and not pd.api.types.is_numeric_dtype(df[col]):
             raise ValueError(f"Coluna '{col}' não é numérica; use contagem ou distintos")
-        parsed.append({"col": col, "agg": agg, "nome": f"{LABEL[agg]} {col}"})
+        parsed.append({"col": col, "agg": agg, "nome": f"{LABEL[agg]} {_no_meio(rotulo(col))}"})
     for f in filters:
         if f not in df.columns:
             raise KeyError(f"Coluna de filtro inexistente: {f}")
@@ -95,7 +119,8 @@ def build_payload(df: pd.DataFrame, date: str | None, filters: list[str], measur
     for f in filters:
         work[f] = work[f].astype("string").fillna("(vazio)")
     cols = sorted({m["col"] for m in measures})
-    payload = {"n": 0, "preagregado": preagg, "dims": {}, "medidas": measures, "tem_data": bool(date)}
+    payload = {"n": 0, "preagregado": preagg, "dims": {}, "medidas": measures, "tem_data": bool(date),
+               "rotulos": {c: rotulo(c) for c in ([date] if date else []) + filters + cols}}
     if preagg:
         keys = (["__d"] if date else []) + filters
         g = work.groupby(keys, dropna=False)
@@ -162,8 +187,8 @@ TEMPLATE = r"""<!DOCTYPE html>
 <title>__TITLE__</title>
 __PLOTLY__
 <style>
-:root{color-scheme:light;--surface-0:#f3f5f9;--surface-1:#ffffff;--surface-2:#f6f8fb;--border:#e2e5ec;--text-primary:#0e1222;--text-secondary:#4a5068;--muted:#7d8398;
---series-1:#2a78d6;--series-1-soft:#b7d3f6;--seq-lo:#d3e4fa;--seq-hi:#0b3a80;--good:#008300;--critical:#e34948;--grid:#edf0f4;
+:root{color-scheme:light;accent-color:var(--series-1);--surface-0:#f3f5f9;--surface-1:#ffffff;--surface-2:#f6f8fb;--border:#e2e5ec;--text-primary:#0e1222;--text-secondary:#4a5068;--muted:#646a7e;
+--series-1:#2a78d6;--series-1-soft:#b7d3f6;--seq-lo:#d3e4fa;--seq-hi:#0b3a80;--good:#006b00;--critical:#c0302f;--grid:#edf0f4;
 --hero-a:#0b2a5b;--hero-b:#1a4f9c;--sheen:rgba(42,120,214,.10);
 --shadow:0 1px 2px rgba(16,24,40,.05),0 8px 24px rgba(16,24,40,.07);--shadow-up:0 2px 4px rgba(16,24,40,.06),0 18px 40px rgba(16,24,40,.13)}
 :root[data-theme="dark"]{color-scheme:dark;--surface-0:#0d0f14;--surface-1:#161a22;--surface-2:#1c212b;--border:#2a303c;--text-primary:#eef0f5;--text-secondary:#b9bfcc;--muted:#8a91a0;
@@ -172,7 +197,8 @@ __PLOTLY__
 --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px rgba(0,0,0,.35);--shadow-up:0 2px 4px rgba(0,0,0,.5),0 18px 40px rgba(0,0,0,.55)}
 *{box-sizing:border-box}
 body{margin:0;font:14px/1.45 system-ui,"Segoe UI",Roboto,sans-serif;background:var(--surface-0);color:var(--text-primary);transition:background-color .3s,color .3s}
-header{display:flex;align-items:center;gap:12px;padding:18px 24px;background:linear-gradient(115deg,var(--hero-a),var(--hero-b));color:#fff;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px rgba(8,20,48,.25)}
+::selection{background:var(--series-1-soft);color:var(--text-primary)}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:18px 24px;background:linear-gradient(115deg,var(--hero-a),var(--hero-b));color:#fff;position:sticky;top:0;z-index:5;box-shadow:0 4px 18px rgba(8,20,48,.25)}
 .hdr{flex:1;display:flex;flex-direction:column;gap:2px}header h1{font-size:20px;margin:0;letter-spacing:-.01em}header .meta{color:rgba(255,255,255,.85);font-size:12px}
 button,select,input{font:inherit;color:var(--text-primary);background:var(--surface-1);border:1px solid var(--border);border-radius:8px;padding:5px 10px;transition:border-color .2s,background-color .2s,transform .15s}
 button{cursor:pointer}button:hover{border-color:var(--series-1)}button:active{transform:translateY(1px)}
@@ -190,22 +216,23 @@ button[aria-pressed="true"]{background:var(--series-1);border-color:var(--series
 .chips{display:flex;flex-wrap:wrap;gap:6px;padding:10px 24px 0;max-width:1600px;margin:0 auto}
 .chip{background:var(--surface-1);border:1px solid var(--series-1-soft);border-radius:999px;padding:2px 10px;font-size:12px;color:var(--text-secondary);animation:pop .2s ease-out backwards}
 main{padding:18px 24px 24px;display:grid;gap:18px;max-width:1600px;margin:0 auto}
+main>*,.row>*{min-width:0}
 .card{background:var(--surface-1);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow);
  animation:rise .6s cubic-bezier(.2,.7,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms);transition:box-shadow .25s,transform .25s,background-color .3s,border-color .3s}
 .card:hover{box-shadow:var(--shadow-up)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(160px,100%),1fr));gap:14px}
 .kpi{position:relative;overflow:hidden;will-change:transform}
 .kpi::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(90deg,var(--series-1),var(--series-1-soft))}
 .kpi::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(260px circle at var(--mx,50%) var(--my,0%),var(--sheen),transparent 65%);opacity:0;transition:opacity .3s}
 .kpi:hover::after{opacity:1}
-.kpi .lbl{color:var(--text-secondary);font-size:12px;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.kpi .lbl{color:var(--text-secondary);font-size:13px;font-weight:600}
 .kpi .val{font-size:28px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .kpi .delta{font-size:12px;margin-top:4px;color:var(--text-secondary)}
 .pill{display:inline-block;padding:1px 7px;border-radius:999px;font-weight:600}.up{color:var(--good)}.down{color:var(--critical)}
 .pill.up{background:rgba(0,131,0,.1)}.pill.down{background:rgba(227,73,72,.12)}
 .spark{display:block;width:100%;height:38px;margin-top:10px;animation:reveal 1s cubic-bezier(.2,.7,.2,1) backwards}
 .spark .ln{fill:none;stroke:var(--series-1);stroke-width:2;vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
-.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:18px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(380px,100%),1fr));gap:18px}
 .card h2{font-size:15px;font-weight:650;margin:0 0 10px;display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
 .ctl{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .chart{height:340px}.chart3d{height:500px;border-radius:10px;background:radial-gradient(120% 90% at 50% 0%,var(--surface-2),var(--surface-1))}
@@ -220,6 +247,7 @@ tbody tr{transition:background-color .15s}tbody tr:hover{background:var(--surfac
 @keyframes pop{from{opacity:0;transform:translateY(-4px) scale(.97)}}
 @keyframes reveal{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media (max-width:600px){header,.filters,.chips{padding-left:16px;padding-right:16px}main{padding:14px 16px 20px}.chart3d{height:400px}}
 @media print{header{position:static}header button,.filters,.pager,.noprint{display:none!important}.card{break-inside:avoid;animation:none;box-shadow:none}}
 </style>
 </head>
@@ -241,6 +269,8 @@ tbody tr{transition:background-color .15s}tbody tr:hover{background:var(--surfac
 </main>
 <script>
 const D = __DATA__;
+const R = c => (D.rotulos && D.rotulos[c]) || c;  // nome legível da coluna; o CSV exportado mantém o nome original
+const Rm = c => {const r=R(c),w=r.split(' ')[0];return w===w.toUpperCase()?r:r[0].toLowerCase()+r.slice(1)};  // no meio da frase
 const NF = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:2});
 const NF0 = new Intl.NumberFormat('pt-BR',{maximumFractionDigits:0});
 const NF2 = new Intl.NumberFormat('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -250,7 +280,7 @@ const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).
 const fmt = v => v==null||!isFinite(v) ? '–' : (Math.abs(v)>=1e6 ? NF.format(v/1e6)+' mi' : (Number.isInteger(v)?NF0:NF2).format(v));
 const GRAN = {dia:'dia',semana:'semana',mes:'mês',trimestre:'trimestre',ano:'ano'};
 const dims = Object.keys(D.dims);
-const MEDS = [{nome:'Linhas',agg:'linhas'}].concat(D.medidas);
+const MEDS = [{nome:'Registros',agg:'linhas'}].concat(D.medidas);
 const state = {de:null, ate:null, gran:'mes', sel:{}, medTempo:1<MEDS.length?1:0, dimResumo:dims[0]||null, dim3d:dims[0]||null, busca:'', pagina:0, ord:{col:null,asc:true}};
 dims.forEach(d=>state.sel[d]=null);
 let minD=null,maxD=null;
@@ -293,6 +323,14 @@ function periodKey(x,g){
   if(g==='trimestre'){return x.slice(0,4)+'-T'+(Math.floor((+x.slice(5,7)-1)/3)+1)}
   const t=new Date(x+'T00:00:00Z');const wd=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-wd);return t.toISOString().slice(0,10);
 }
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+// rótulo do período para o leitor (a chave continua ISO para ordenar): jan/24, T1/24, 06/01/25
+function perLabel(k,g){
+  if(!k||g==='ano')return k||'';
+  if(g==='mes')return MESES[+k.slice(5,7)-1]+'/'+k.slice(2,4);
+  if(g==='trimestre')return k.slice(5)+'/'+k.slice(2,4);
+  return k.slice(8,10)+'/'+k.slice(5,7)+'/'+k.slice(2,4);
+}
 function shift(x,days){const t=new Date(x+'T00:00:00Z');t.setUTCDate(t.getUTCDate()+days);return t.toISOString().slice(0,10)}
 function daysBetween(a,b){return Math.round((new Date(b)-new Date(a))/864e5)}
 
@@ -311,8 +349,8 @@ function buildFilters(){
   dims.forEach((d,k)=>{
     const vals=D.dims[d].valores;
     const opts=vals.map((v,i)=>`<label class="opt"><input type="checkbox" data-d="${k}" value="${i}" checked> ${esc(v)}</label>`).join('');
-    f.insertAdjacentHTML('beforeend',`<label>${esc(d)}<div class="ms" id="ms${k}"><button type="button" aria-haspopup="true" aria-expanded="false">Todos</button><div class="pop">
-      <input type="search" placeholder="Buscar..." aria-label="Buscar em ${esc(d)}"><div class="acts"><button type="button" data-a="all">Todos</button><button type="button" data-a="none">Nenhum</button></div>${opts}</div></div></label>`);
+    f.insertAdjacentHTML('beforeend',`<label>${esc(R(d))}<div class="ms" id="ms${k}"><button type="button" aria-haspopup="true" aria-expanded="false">Todos</button><div class="pop">
+      <input type="search" placeholder="Buscar..." aria-label="Buscar em ${esc(R(d))}"><div class="acts"><button type="button" data-a="all">Todos</button><button type="button" data-a="none">Nenhum</button></div>${opts}</div></div></label>`);
     const ms=document.getElementById('ms'+k), btn=ms.querySelector('button');
     btn.onclick=e=>{e.stopPropagation();document.querySelectorAll('.ms.open').forEach(o=>{if(o!==ms)o.classList.remove('open')});ms.classList.toggle('open');btn.setAttribute('aria-expanded',ms.classList.contains('open'))};
     ms.querySelector('.pop').onclick=e=>e.stopPropagation();
@@ -365,9 +403,20 @@ function spark(k,ys){
 }
 
 // ------------------------------------------------ visuais
+// Textos dos botões do Plotly em português; o Plotly embutido só traz o inglês.
+Plotly.register({moduleType:'locale',name:'pt-BR',dictionary:{'Autoscale':'Escala automática','Box Select':'Seleção retangular',
+  'Compare data on hover':'Comparar dados ao passar o mouse','Double-click to zoom back out':'Clique duas vezes para voltar ao zoom inicial',
+  'Download plot':'Baixar gráfico','Download plot as a PNG':'Baixar gráfico como PNG','Lasso Select':'Seleção livre','Orbital rotation':'Rotação orbital',
+  'Pan':'Mover','Reset axes':'Restaurar eixos','Reset camera to default':'Restaurar vista inicial','Reset camera to last save':'Restaurar última vista',
+  'Reset view':'Restaurar vista','Reset views':'Restaurar vistas','Show closest data on hover':'Mostrar o dado mais próximo ao passar o mouse',
+  'Toggle Spike Lines':'Linhas de guia','Toggle show closest data on hover':'Alternar dado mais próximo','Turntable rotation':'Rotação de mesa',
+  'Zoom':'Zoom','Zoom in':'Aproximar','Zoom out':'Afastar'},
+  format:{decimal:',',thousands:'.',grouping:[3],months:['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'],
+  shortMonths:MESES,days:['domingo','segunda','terça','quarta','quinta','sexta','sábado'],shortDays:['dom','seg','ter','qua','qui','sex','sáb'],date:'%d/%m/%Y'}});
+const EIXO={zeroline:false,separatethousands:true,exponentformat:'none'};  // 1.400 e 15.000, não 1400 e 15k
 function layout(extra){return Object.assign({margin:{l:60,r:16,t:8,b:40},paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
   font:{family:'system-ui,Segoe UI,sans-serif',color:css('--text-secondary'),size:12},separators:',.',
-  xaxis:{gridcolor:css('--grid'),linecolor:css('--border'),zeroline:false},yaxis:{gridcolor:css('--grid'),linecolor:css('--border'),zeroline:false,rangemode:'tozero'},
+  xaxis:Object.assign({gridcolor:css('--grid'),linecolor:css('--border')},EIXO),yaxis:Object.assign({gridcolor:css('--grid'),linecolor:css('--border'),rangemode:'tozero'},EIXO),
   hoverlabel:{bgcolor:css('--surface-1'),bordercolor:css('--border'),font:{color:css('--text-primary')}},showlegend:false,
   transition:{duration:RM.matches?0:500,easing:'cubic-in-out'}},extra||{})}
 const CFG={displaylogo:false,responsive:true,locale:'pt-BR',modeBarButtonsToRemove:['lasso2d','select2d']};
@@ -391,15 +440,16 @@ function renderKpis(idx){
 function renderTempo(idx){
   if(!D.tem_data){document.getElementById('rowTempo').style.display='none';return}
   const m=MEDS[state.medTempo];const g=groupBy(idx,i=>periodKey(D.datas[i],state.gran),m).sort((a,b)=>a[0]<b[0]?-1:1);const c=css('--series-1');
-  Plotly.react('chTempo',[{x:g.map(r=>r[0]),y:g.map(r=>r[1]),type:'scatter',mode:g.length>60?'lines':'lines+markers',
+  Plotly.react('chTempo',[{x:g.map(r=>perLabel(r[0],state.gran)),y:g.map(r=>r[1]),type:'scatter',mode:g.length>60?'lines':'lines+markers',
     fill:'tozeroy',fillgradient:{type:'vertical',colorscale:[[0,rgba(c,0)],[1,rgba(c,.28)]]},
     line:{color:c,width:2},marker:{size:8,color:c,line:{color:css('--surface-1'),width:2}},
-    hovertemplate:'%{x}<br><b>%{y:,.2f}</b><extra>'+esc(m.nome)+'</extra>'}],layout({hovermode:'x unified',xaxis:{type:'category',gridcolor:css('--grid'),linecolor:css('--border'),nticks:12}}),CFG);
-  document.getElementById('tTempo').textContent='Evolução — '+m.nome;
+    hovertemplate:'%{x}<br><b>%{y:,.2f}</b><extra>'+esc(m.nome)+'</extra>'}],
+    layout({hovermode:'x unified',xaxis:{type:'category',gridcolor:css('--grid'),linecolor:css('--border'),nticks:innerWidth<600?6:12}}),CFG);
+  document.getElementById('tTempo').textContent=`Evolução — ${m.nome} por ${GRAN[state.gran]}`;
 }
 function renderDims(){
   const row=document.getElementById('rowDims');
-  if(!row.dataset.ok){row.innerHTML=dims.map((d,k)=>`<div class="card" style="--i:${4+k}"><h2><span>${esc(d)}</span><span class="note">clique para filtrar</span></h2><div id="chDim${k}" class="chart"></div></div>`).join('');row.dataset.ok=1;}
+  if(!row.dataset.ok){row.innerHTML=dims.map((d,k)=>`<div class="card" style="--i:${4+k}"><h2><span>${esc(R(d))}</span><span class="note">clique para filtrar</span></h2><div id="chDim${k}" class="chart"></div></div>`).join('');row.dataset.ok=1;}
   const m=MEDS[state.medTempo];
   dims.forEach((d,k)=>{
     const idx=filtered({exceto:d});const vals=D.dims[d].valores;
@@ -419,10 +469,13 @@ function renderDims(){
 // ------------------------------------------------ visão 3D (barras período × item, WebGL)
 const V3={ok:true,rot:false,vis:true,busy:false,anim:0,last:0,ck:0,prev:new Map(),cats:[],bars:[]};
 const CAM0={eye:{x:1.38,y:-1.62,z:1.0},center:{x:0,y:0,z:-.2},up:{x:0,y:0,z:1}};  // centro baixo: sobe o gráfico e evita cortar os rótulos da base
+// tela estreita (celular): câmera mais longe para a cena inteira caber na largura
+function cam0(){const c=structuredClone(CAM0),k=innerWidth<600?2.2:1;c.eye={x:c.eye.x*k,y:c.eye.y*k,z:c.eye.z*k};return c}
 const BOXV=[[-1,-1,0],[1,-1,0],[1,1,0],[-1,1,0],[-1,-1,1],[1,-1,1],[1,1,1],[-1,1,1]];
 const FI=[0,0,4,4,0,0,1,1,2,2,3,3],FJ=[1,2,5,6,1,5,2,6,3,7,0,4],FK=[2,3,6,7,5,4,6,5,7,6,4,7];
 function webgl(){try{const c=document.createElement('canvas');return !!(c.getContext('webgl2')||c.getContext('webgl'))}catch(e){return false}}
 function fail3d(){V3.ok=false;V3.rot=false;const el=document.getElementById('ch3d');try{Plotly.purge(el)}catch(e){}
+  el.classList.remove('js-plotly-plot');  // o aviso substitui o gráfico; a conferência não deve cobrar o desenho dele
   el.innerHTML='<div class="fallback">Visão 3D indisponível: este navegador não oferece WebGL (aceleração gráfica). Os demais gráficos e filtros não são afetados.</div>';
   document.querySelector('#sec3d .ctl').style.display='none';document.getElementById('n3d').textContent=''}
 function setRot(on){V3.rot=!!on&&!RM.matches&&V3.ok;const b=document.getElementById('btnGirar');b.setAttribute('aria-pressed',V3.rot);b.textContent=V3.rot?'Pausar giro':'Girar'}
@@ -438,10 +491,10 @@ function render3d(){
   const cpos=new Map(cats.map((c,j)=>[c,j])),ppos=new Map(P.map((p,j)=>[p,j]));
   const cells=groupBy(idx,i=>{const c=D.dims[d].codigos[i],p=periodKey(D.datas[i],state.gran);return cpos.has(c)&&ppos.has(p)?c+'|'+p:null},m);
   const bars=cells.filter(r=>r[1]!=null&&isFinite(r[1])).map(([k,v])=>{const [c,p]=k.split('|');
-    return {k,ci:cpos.get(+c),pj:ppos.get(p),v,txt:`${esc(vals[c])}<br>${p}<br><b>${fmt(v)}</b>`}});
+    return {k,ci:cpos.get(+c),pj:ppos.get(p),v,txt:`${esc(vals[c])}<br>${perLabel(p,state.gran)}<br><b>${fmt(v)}</b>`}});
   V3.cats=cats;V3.bars=bars;
-  document.getElementById('t3d').textContent=`Visão 3D — ${m.nome} por ${d} e ${GRAN[state.gran]}`;
-  document.getElementById('n3d').textContent=(tot.length>8?`Os 8 maiores de ${tot.length} itens de ${d}. `:'')+(allP.length>24?`Últimos 24 de ${allP.length} períodos. `:'')+
+  document.getElementById('t3d').textContent=`Visão 3D — ${m.nome} por ${Rm(d)} e ${GRAN[state.gran]}`;
+  document.getElementById('n3d').textContent=(tot.length>8?`Os 8 maiores de ${tot.length} itens de ${Rm(d)}. `:'')+(allP.length>24?`Últimos 24 de ${allP.length} períodos. `:'')+
     'Arraste para girar, use a roda do mouse para aproximar e clique numa barra para filtrar. Para ler valores exatos, use os rankings e o resumo.';
   if(!bars.length){V3.prev=new Map();try{Plotly.purge(el)}catch(e){}el.innerHTML='<div class="fallback">Sem dados no filtro atual.</div>';return}
   if(el.querySelector('.fallback'))el.innerHTML='';
@@ -451,17 +504,18 @@ function render3d(){
     gridcolor:css('--grid'),linecolor:css('--border'),zerolinecolor:css('--border'),showbackground:true,backgroundcolor:rgba(css('--surface-2'),.6),showspikes:false});
   const step=Math.ceil(P.length/12),sel=state.sel[d],pv=P.map((_,j)=>j).filter(j=>j%step===0);
   const lay=()=>layout({margin:{l:0,r:0,t:0,b:0},scene:{bgcolor:'rgba(0,0,0,0)',aspectmode:'manual',aspectratio:{x:1.7,y:1.05,z:.75},
-    camera:(el.layout&&el.layout.scene&&el.layout.scene.camera)||structuredClone(CAM0),
-    xaxis:ax('Período',pv,pv.map(j=>P[j])),yaxis:ax(short(d),cats.map((_,j)=>j),cats.map(c=>(sel&&sel.has(c)?'● ':'')+short(vals[c]))),
-    zaxis:Object.assign(ax(m.nome),{rangemode:'tozero',separatethousands:true})}});
+    camera:(el.layout&&el.layout.scene&&el.layout.scene.camera)||cam0(),
+    xaxis:ax('Período',pv,pv.map(j=>perLabel(P[j],state.gran))),yaxis:ax(short(R(d)),cats.map((_,j)=>j),cats.map(c=>(sel&&sel.has(c)?'● ':'')+short(vals[c]))),
+    zaxis:Object.assign(ax(m.nome),{rangemode:'tozero',separatethousands:true,exponentformat:'none'})}});
   const trace=e=>{const X=[],Y=[],Z=[],I=[],J=[],K=[],INT=[],TX=[];
     bars.forEach((b,n)=>{const v0=from.has(b.k)?from.get(b.k):0,v=v0+(b.v-v0)*e,z0=Math.min(0,v),z1=Math.max(0,v),o=n*8;
       for(const [sx,sy,t] of BOXV){X.push(b.pj+sx*.34);Y.push(b.ci+sy*.34);Z.push(t?z1:z0);TX.push(b.txt)}
       for(let q=0;q<12;q++){I.push(o+FI[q]);J.push(o+FJ[q]);K.push(o+FK[q]);INT.push(b.v)}});
     return [{type:'mesh3d',x:X,y:Y,z:Z,i:I,j:J,k:K,intensity:INT,intensitymode:'cell',cmin:lo,cmax:hi,colorscale:[[0,css('--seq-lo')],[1,css('--seq-hi')]],
+      showscale:innerWidth>=600,  // no celular a escala de cor tiraria espaço da cena; a altura já mostra o valor
       flatshading:true,lighting:{ambient:.55,diffuse:.85,specular:.25,roughness:.55,fresnel:.1},lightposition:{x:2e3,y:-3e3,z:5e3},
       text:TX,hovertemplate:'%{text}<extra></extra>',
-      colorbar:{title:{text:m.nome,side:'right'},thickness:10,len:.6,outlinewidth:0,tickfont:{color:css('--text-secondary')},separatethousands:true}}]};
+      colorbar:{title:{text:m.nome,side:'right'},thickness:10,len:.6,outlinewidth:0,tickfont:{color:css('--text-secondary')},separatethousands:true,exponentformat:'none'}}]};
   const plot=e=>{try{return Promise.resolve(Plotly.react(el,trace(e),lay(),CFG))}catch(err){return Promise.reject(err)}};
   const token=++V3.anim,t0=performance.now();V3.busy=true;
   const frame=t=>{if(token!==V3.anim)return;const p=RM.matches?1:Math.min(1,(t-t0)/650);
@@ -494,7 +548,7 @@ function renderResumo(idx){
   const keys=[...per[0].keys()].sort((a,b)=>(per[0].get(b)||0)-(per[0].get(a)||0));
   resumoRows=keys.map(k=>[names[k]].concat(per.map(p=>p.get(k))));
   const tot=['Total'].concat(MEDS.map(m=>aggregate(idx,m)));
-  t.innerHTML=`<thead><tr><th>${esc(d||'')}</th>${MEDS.map(m=>`<th class="n">${esc(m.nome)}</th>`).join('')}<th class="n">% Linhas</th></tr></thead><tbody>`+
+  t.innerHTML=`<thead><tr><th>${esc(d?R(d):'')}</th>${MEDS.map(m=>`<th class="n">${esc(m.nome)}</th>`).join('')}<th class="n">% dos registros</th></tr></thead><tbody>`+
    resumoRows.map(r=>`<tr><td>${esc(r[0])}</td>${r.slice(1).map(v=>`<td class="n">${fmt(v)}</td>`).join('')}<td class="n">${tot[1]?NF.format(r[1]/tot[1]*100)+'%':'–'}</td></tr>`).join('')+
    `</tbody><tfoot><tr><th>Total</th>${tot.slice(1).map(v=>`<th class="n">${fmt(v)}</th>`).join('')}<th class="n">100%</th></tr></tfoot>`;
 }
@@ -511,7 +565,7 @@ function renderDetalhe(idx){
   const pages=Math.max(1,Math.ceil(detRows.length/PAGE));if(state.pagina>=pages)state.pagina=pages-1;
   const slice=detRows.slice(state.pagina*PAGE,(state.pagina+1)*PAGE);
   const t=document.getElementById('tblDetalhe');
-  t.innerHTML=`<thead><tr>${cols.map((c,j)=>`<th data-c="${j}" class="${typeof (slice[0]||[])[j]==='number'?'n':''}">${esc(c)}${state.ord.col===j?(state.ord.asc?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>`+
+  t.innerHTML=`<thead><tr>${cols.map((c,j)=>`<th data-c="${j}" class="${typeof (slice[0]||[])[j]==='number'?'n':''}">${esc(R(c))}${state.ord.col===j?(state.ord.asc?' ▲':' ▼'):''}</th>`).join('')}</tr></thead><tbody>`+
    slice.map(r=>`<tr>${r.map(v=>typeof v==='number'?`<td class="n">${fmt(v)}</td>`:`<td>${v==null?'':esc(v)}</td>`).join('')}</tr>`).join('')+'</tbody>';
   t.querySelectorAll('th').forEach(th=>th.onclick=()=>{const c=+th.dataset.c;state.ord=state.ord.col===c?{col:c,asc:!state.ord.asc}:{col:c,asc:true};renderDetalhe(filtered())});
   document.getElementById('pgInfo').textContent=`${NF0.format(detRows.length)} linhas · página ${state.pagina+1} de ${pages}`;
@@ -523,7 +577,7 @@ function csvDownload(name,header,rows){
 }
 function renderChips(){
   const c=[];if(D.tem_data&&(state.de!==minD||state.ate!==maxD))c.push(`Período: ${fmtD(state.de)} a ${fmtD(state.ate)}`);
-  dims.forEach(d=>{const s=state.sel[d];if(s)c.push(`${d}: ${[...s].slice(0,3).map(k=>D.dims[d].valores[k]).join(', ')}${s.size>3?' +'+(s.size-3):''}`)});
+  dims.forEach(d=>{const s=state.sel[d];if(s)c.push(`${R(d)}: ${[...s].slice(0,3).map(k=>D.dims[d].valores[k]).join(', ')}${s.size>3?' +'+(s.size-3):''}`)});
   document.getElementById('chips').innerHTML=c.map(x=>`<span class="chip">${esc(x)}</span>`).join('');
 }
 function fmtD(x){return x?x.split('-').reverse().join('/'):'…'}
@@ -536,17 +590,17 @@ function update(){
 buildFilters();
 const sm=document.getElementById('selMedTempo');sm.innerHTML=MEDS.map((m,i)=>`<option value="${i}" ${i===state.medTempo?'selected':''}>${esc(m.nome)}</option>`).join('');
 sm.onchange=e=>{state.medTempo=+e.target.value;update()};
-const sd=document.getElementById('selDimResumo');sd.innerHTML=dims.length?dims.map(d=>`<option>${esc(d)}</option>`).join(''):'<option value="">(sem dimensões)</option>';
+const sd=document.getElementById('selDimResumo');sd.innerHTML=dims.length?dims.map(d=>`<option value="${esc(d)}">${esc(R(d))}</option>`).join(''):'<option value="">(sem dimensões)</option>';
 sd.onchange=e=>{state.dimResumo=e.target.value||null;renderResumo(filtered())};
-const s3=document.getElementById('sel3d');s3.innerHTML=dims.map(d=>`<option>${esc(d)}</option>`).join('');
+const s3=document.getElementById('sel3d');s3.innerHTML=dims.map(d=>`<option value="${esc(d)}">${esc(R(d))}</option>`).join('');
 s3.onchange=e=>{state.dim3d=e.target.value;V3.prev=new Map();render3d()};
 btnGirar.onclick=()=>setRot(!V3.rot);
-btnVista.onclick=()=>{if(V3.ok)Plotly.relayout('ch3d',{'scene.camera':structuredClone(CAM0)})};
+btnVista.onclick=()=>{if(V3.ok)Plotly.relayout('ch3d',{'scene.camera':cam0()})};
 document.getElementById('busca').oninput=e=>{state.busca=e.target.value;state.pagina=0;renderDetalhe(filtered())};
 pgAnt.onclick=()=>{if(state.pagina>0){state.pagina--;renderDetalhe(filtered())}};
 pgProx.onclick=()=>{state.pagina++;renderDetalhe(filtered())};
 btnCsv.onclick=()=>csvDownload('detalhe_filtrado.csv',D.detalhe.colunas,detRows);
-btnCsvResumo.onclick=()=>csvDownload('resumo.csv',[state.dimResumo||''].concat(MEDS.map(m=>m.nome)),resumoRows);
+btnCsvResumo.onclick=()=>csvDownload('resumo.csv',[state.dimResumo?R(state.dimResumo):''].concat(MEDS.map(m=>m.nome)),resumoRows);
 btnTema.onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark';localStorage.setItem('tema',r.dataset.theme);update()};
 if(localStorage.getItem('tema')==='dark'||(!localStorage.getItem('tema')&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.dataset.theme='dark';
 document.getElementById('nota').textContent=(D.preagregado?'Dados pré-agregados por dia e filtros para caber no navegador; médias são recalculadas a partir de soma e contagem. ':'')+

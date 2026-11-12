@@ -18,4 +18,5 @@ Repositório de skills de análise e ciência de dados em português (Claude Cod
 - Não aceite EULA nem registre credenciais em nome do usuário.
 - Mudança em script exige teste de comportamento, inclusive caminho de erro. Não enfraqueça travas de cardinalidade, separação temporal ou validação de entrada.
 - Antes de concluir: `python -m pytest` e `python ferramentas/validar_skills.py` passando.
+- Mudança visual no painel ou em qualquer HTML gerado: `conferir_painel.py` sem defeitos e as fotos olhadas (computador e celular, temas claro e escuro). A medição não vê corte nem sobreposição.
 - SKILL.md com menos de 500 linhas; detalhe vai para `references/`.

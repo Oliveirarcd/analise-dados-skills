@@ -10,7 +10,7 @@ Skills de análise e ciência de dados em português para o **Claude Code** (e c
 |---|---|---|
 | `analise-dados` | porta de entrada: contrato da análise, perfil, limpeza, cruzamento, estatística, ML, entrega | `perfil.py`, `cruzar.py`, `estatistica.py` |
 | `series-temporais` | tendência, sazonalidade, anomalias, backtest sem vazamento, previsão com intervalo | `serie.py` |
-| `dashboard-html` | painel de arquivo único, offline, com filtros, filtro cruzado, KPIs animados, visão 3D interativa, tabelas e exportação CSV | `dashboard_html.py` |
+| `dashboard-html` | painel de arquivo único, offline, com filtros, filtro cruzado, KPIs animados, visão 3D interativa, tabelas e exportação CSV; conferência visual em computador e celular antes de entregar | `dashboard_html.py`, `conferir_painel.py` |
 | `power-bi-mcp` | modelo estrela, tabela Calendário, DAX, Power Query, PBIP/TMDL/PBIR, validação, uso do MCP | `modelo_estrela.py` + MCP oficial |
 
 Os scripts entendem o padrão brasileiro sem configuração: separador `;`, vírgula decimal, ponto de milhar, datas `dd/mm/aaaa`, arquivos em cp1252 e códigos com zero à esquerda (CNPJ, CEP, código de loja).
@@ -54,6 +54,8 @@ Leia antes as regras de uso em [skills/power-bi-mcp/references/operar-windows.md
 
 Python 3.10 ou mais novo com `pandas`, `numpy`, `scipy`, `statsmodels`, `openpyxl` e `plotly` (`pip install -r requirements.txt`). Com `uv`: `uv sync`.
 
+Opcional, para a conferência visual dos painéis: `pip install playwright` (com `uv`: `uv sync --group visual`). Ela usa o Chrome ou o Edge já instalados; sem nenhum dos dois, rode `playwright install chromium`.
+
 ## Exemplos rápidos
 
 Gere os dados sintéticos e experimente (tudo fictício, nada de dado real):
@@ -69,6 +71,7 @@ python $S/serie.py prever exemplos/dados/serie_mensal.csv --data mes --valor rec
 python $S/estatistica.py comparar exemplos/dados/vendas.csv --valor valor --grupo canal --saida saidas/canal.json
 python $S/modelo_estrela.py exemplos/dados/vendas.csv exemplos/dados/lojas.csv exemplos/dados/produtos.csv --saida saidas/modelo_pbi
 python $S/dashboard_html.py exemplos/dados/vendas.csv --titulo "Vendas" --filtros canal cod_loja cod_produto --saida saidas/painel.html
+python $S/conferir_painel.py saidas/painel.html --saida saidas/conferencia
 ```
 
 O que cada um mostra com esses dados:
@@ -78,6 +81,7 @@ O que cada um mostra com esses dados:
 - O backtest da série mensal escolhe ETS com MASE 0,26, bem melhor que o ingênuo sazonal.
 - O modelo estrela identifica `vendas` como fato, `lojas` e `produtos` como dimensões, avisa as 8 chaves órfãs e gera 25 medidas DAX com tabela Calendário.
 - O painel abre no navegador com filtros e totais idênticos aos do pandas.
+- A conferência fotografa o painel em 1440 e 390 px, nos temas claro e escuro, e sai sem defeitos: nenhum erro de script, nenhuma rolagem para o lado e todo texto com contraste de pelo menos 4,5:1.
 
 [exemplos/painel_exemplo.html](exemplos/painel_exemplo.html) é um painel pronto. Baixe o arquivo e abra no navegador. Essa versão carrega o Plotly da internet; a versão gerada sem `--cdn` funciona offline.
 
@@ -97,7 +101,7 @@ Não é preciso citar a skill. Exemplos de pedidos que ativam cada uma:
 | Parte | Estado |
 |---|---|
 | Scripts Python | testes de comportamento (pasta `tests/`) rodando em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
-| Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas; na visão 3D, passar o mouse e clicar numa barra testados com eventos reais de mouse; aviso sem WebGL e modo "reduzir movimento" testados. As transições foram vistas só no estado final |
+| Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas; na visão 3D, passar o mouse e clicar numa barra testados com eventos reais de mouse; aviso sem WebGL e modo "reduzir movimento" testados. As transições foram vistas só no estado final. Desde 12/11/2026, `conferir_painel.py` (Playwright) entra nos testes: 1440 e 390 px, claro e escuro, sem defeitos e com os KPIs da tela iguais aos do pandas. Rodado localmente com o Chrome; no GitHub Actions usa o Chrome do executor e é pulado se faltar navegador |
 | DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
 | MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |
 | MCP do Windows | configuração opcional conforme o README do projeto em 05/11/2026; **não executado** neste repositório (nem a lista de ferramentas nem a operação da tela) |

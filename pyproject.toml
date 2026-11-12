@@ -1,6 +1,6 @@
 [project]
 name = "analise-dados-skills"
-version = "1.0.0"
+version = "1.1.0"
 description = "Skills de análise e ciência de dados em português: perfil, cruzamento auditado, séries temporais, estatística e Power BI via MCP."
 requires-python = ">=3.10"
 dependencies = [
@@ -14,6 +14,9 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest>=8"]
+visual = [
+    "playwright>=1.65.1",
+]
 
 [tool.uv]
 package = false

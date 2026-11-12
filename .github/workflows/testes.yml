@@ -20,7 +20,7 @@ jobs:
       - name: Dependências
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt pytest
+          pip install -r requirements.txt pytest playwright  # conferência visual usa o Chrome do executor
       - name: Testes
         run: python -m pytest
       - name: Validação do repositório
