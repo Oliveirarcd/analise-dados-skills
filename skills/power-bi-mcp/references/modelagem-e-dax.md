@@ -72,7 +72,9 @@ Vendas Acum Ano = TOTALYTD([Total Vendas], 'Calendario'[Data])
 Vendas Acum Ano AA = CALCULATE([Vendas Acum Ano], SAMEPERIODLASTYEAR('Calendario'[Data]))
 Vendas Mes Anterior = CALCULATE([Total Vendas], DATEADD('Calendario'[Data], -1, MONTH))
 Vendas Media Movel 3M =
-    AVERAGEX(DATESINPERIOD('Calendario'[Data], MAX('Calendario'[Data]), -3, MONTH), [Total Vendas])
+    VAR Fim = EOMONTH(MAX('Calendario'[Data]), 0)
+    RETURN DIVIDE(CALCULATE([Total Vendas], REMOVEFILTERS('Calendario'),
+        DATESBETWEEN('Calendario'[Data], EOMONTH(Fim, -3) + 1, Fim)), 3)
 Vendas 12M = CALCULATE([Total Vendas], DATESINPERIOD('Calendario'[Data], MAX('Calendario'[Data]), -12, MONTH))
 ```
 

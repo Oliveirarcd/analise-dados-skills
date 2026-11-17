@@ -1,6 +1,6 @@
 [project]
 name = "analise-dados-skills"
-version = "1.1.0"
+version = "1.1.1"
 description = "Skills de análise e ciência de dados em português: perfil, cruzamento auditado, séries temporais, estatística e Power BI via MCP."
 requires-python = ">=3.10"
 dependencies = [

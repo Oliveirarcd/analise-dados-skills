@@ -118,8 +118,8 @@ A skill traz só o que vale para qualquer base. O que é de um projeto (nomes de
 |---|---|
 | Scripts Python | testes de comportamento (pasta `tests/`) rodando em Windows e Linux, Python 3.11 e 3.13 (GitHub Actions) |
 | Dashboard HTML | renderizado no Edge sem interface gráfica, nos temas claro e escuro; filtros, filtro cruzado, busca e KPIs conferidos contra o pandas; na visão 3D, passar o mouse e clicar numa barra testados com eventos reais de mouse; aviso sem WebGL e modo "reduzir movimento" testados. As transições foram vistas só no estado final. Desde 12/11/2026, `conferir_painel.py` (Playwright) entra nos testes: 1440 e 390 px, claro e escuro, sem defeitos e com os KPIs da tela iguais aos do pandas. Rodado localmente com o Chrome; no GitHub Actions usa o Chrome do executor e é pulado se faltar navegador |
-| DAX gerado | sintaxe revisada; não executado em um modelo real neste repositório |
-| MCP do Power BI | configuração conforme a documentação oficial de 05/11/2026; **conexão real não testada** (depende do seu Power BI Desktop, do EULA e da sua conta) |
+| DAX gerado | tabela Calendário e 25 medidas aplicadas e executadas no Power BI Desktop em 17/11/2026 com os CSVs fictícios do repositório. Totais de 2025, ano anterior, filtro por região, 8 chaves órfãs e média móvel de três meses conferidos contra o pandas. No PBIX de teste, a tabela Calendário recebeu outro nome para coexistir com a tabela do teste anterior |
+| MCP do Power BI | conexão local com o Power BI Desktop testada em 17/11/2026 com a versão 1.0.1 do servidor: leitura, criação de tabelas, coluna, relacionamentos e medidas, atualização do modelo e consultas DAX passaram. Um cartão com o total dos dados fictícios foi conferido pelo usuário no Desktop. Publicação no Fabric não testada |
 | MCP do Windows | configuração opcional conforme o README do projeto em 05/11/2026; **não executado** neste repositório (nem a lista de ferramentas nem a operação da tela) |
 | Referências | conteúdo de orientação; não executável |
 

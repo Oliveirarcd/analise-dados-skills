@@ -228,6 +228,8 @@ def test_modelo_estrela(dados):
     nomes = {m["nome"] for m in ms}
     assert "Total valor" in nomes and "Total valor Var % AA" in nomes
     assert "DIVIDE" in next(m["expressao"] for m in ms if m["nome"] == "Total valor Var % AA")
+    media_movel = next(m["expressao"] for m in ms if m["nome"] == "Total valor Média Móvel 3M")
+    assert "EOMONTH(Fim, -3) + 1" in media_movel and "REMOVEFILTERS('Calendario')" in media_movel
     assert "CALENDAR" in modelo_estrela.calendar_dax(roles)
     loja = next(r for r in rels if r["de_coluna"] == "cod_loja")
     assert loja["orfaos"] == 8

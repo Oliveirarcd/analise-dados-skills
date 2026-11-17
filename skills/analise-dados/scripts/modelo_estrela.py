@@ -114,7 +114,9 @@ def build_measures(roles: dict) -> list[dict]:
                     {"nome": f"{base} Var % MM", "tabela": "_Medidas", "pasta": ti, "formato": "0.0%;-0.0%;0.0%",
                      "expressao": f"DIVIDE([{base}] - [{base} Mês Anterior], [{base} Mês Anterior])"},
                     {"nome": f"{base} Média Móvel 3M", "tabela": "_Medidas", "pasta": ti, "formato": "#,0.00",
-                     "expressao": f"AVERAGEX(DATESINPERIOD('Calendario'[Data], MAX('Calendario'[Data]), -3, MONTH), [{base}])"},
+                     "expressao": f"VAR Fim = EOMONTH(MAX('Calendario'[Data]), 0)\n"
+                                f"RETURN DIVIDE(CALCULATE([{base}], REMOVEFILTERS('Calendario'), "
+                                f"DATESBETWEEN('Calendario'[Data], EOMONTH(Fim, -3) + 1, Fim)), 3)"},
                 ]
     return ms
 

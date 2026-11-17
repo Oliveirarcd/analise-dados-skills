@@ -2,6 +2,16 @@
 
 O que mudou em cada versão. A política de versões (quando sobe o número maior, o menor ou a correção) está em [docs/manutencao.md](docs/manutencao.md). Para atualizar a sua instalação, veja "Como atualizar" no [README](README.md).
 
+## 1.1.1 — 17/11/2026
+
+### Corrigido
+
+- A média móvel de três meses agora divide a soma de três meses completos por três. Antes, calculava a média diária dentro do período.
+
+### Documentação
+
+- Registrado no README o teste real do MCP local com o Power BI Desktop: conexão, leitura, criação de objetos, atualização e validação por DAX. A tabela Calendário e as 25 medidas geradas foram executadas com os CSVs fictícios; totais e filtros conferidos com o pandas.
+
 ## 1.1.0 — 12/11/2026
 
 ### Acrescentado
